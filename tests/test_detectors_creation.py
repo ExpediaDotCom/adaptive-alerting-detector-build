@@ -14,14 +14,16 @@ def test_get_sample_std_dev_for_floats():
     sample = [35.2, 42.9, 37.8, 9.3, 15.0, 10.1, 20]
     assert isclose(sample_std_dev(sample), 14.015671, rel_tol=0.0001)
 
-#def test_get_sample_std_dev_for_single_value():
-#    sample = [35.2]
-#    assert isclose(sample_std_dev(sample), 0.00, rel_tol=0.0001)
+def test_get_sample_std_dev_raises_error_for_single_value():
+    sample = [35.2]
+    with pytest.raises(Exception) as exception:
+        assert isclose(sample_std_dev(sample), 0)
+    assert str(exception.value) == "Sample must have at least two elements"
 
 def test_get_sample_std_dev_raises_error_with_empty_list():
     with pytest.raises(Exception) as exception:
         assert isclose(sample_std_dev([]), 0)
-        assert str(exception.val) == "sample must have at least one element"
+    assert str(exception.value) == "Sample must have at least two elements"
 
 
 ################################################################################
@@ -29,7 +31,7 @@ def test_get_sample_std_dev_raises_error_with_empty_list():
 ################################################################################
 
 def sample_std_dev(sample):
-    if len(sample) < 1:
-        raise Exception("Sample must have at least one element")
+    if len(sample) < 2:
+        raise Exception("Sample must have at least two elements")
     return stdev(sample)
 
