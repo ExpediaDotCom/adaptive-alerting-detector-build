@@ -1,2 +1,7 @@
 # adaptive-alerting-detector-build
-Adaptive Alerting detector build library
+
+Adaptive Alerting Python Library
+
+```
+pip install git+https://github.com/ExpediaDotCom/adaptive-alerting-detector-build.git#egg=adaptivealerting
+```
