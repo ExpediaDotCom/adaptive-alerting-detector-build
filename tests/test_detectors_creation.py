@@ -1,7 +1,7 @@
 import logging
-from statistics import stdev
 from math import isclose
 import pytest
+import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
@@ -33,5 +33,6 @@ def test_get_sample_std_dev_raises_error_with_empty_list():
 def sample_std_dev(sample):
     if len(sample) < 2:
         raise Exception("Sample must have at least two elements")
-    return stdev(sample)
+    np_sample = np.array(sample)
+    return np.std(np_sample, ddof=1)
 
