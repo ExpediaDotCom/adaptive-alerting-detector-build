@@ -25,6 +25,13 @@ def test_get_sample_std_dev_raises_error_with_empty_list():
         assert isclose(sample_std_dev([]), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
+def test_calculate_quartiles_without_multipliers():
+    sample = [2, 5, 6, 7, 10, 22, 13, 14, 16, 65, 45, 12]
+    q1, median, q3 = calculate_quartiles(sample)
+    assert q1 == 6.5
+    assert median == 12.5
+    assert q3 == 19.0
+
 
 ################################################################################
 ## implementation
@@ -33,6 +40,9 @@ def test_get_sample_std_dev_raises_error_with_empty_list():
 def sample_std_dev(sample):
     if len(sample) < 2:
         raise Exception("Sample must have at least two elements")
-    np_sample = np.array(sample)
-    return np.std(np_sample, ddof=1)
+    array = np.array(sample)
+    return np.std(array, ddof=1)
 
+def calculate_quartiles(sample):
+    array = np.array(sample)
+    return np.percentile(array, [25, 50, 75], interpolation='midpoint')
