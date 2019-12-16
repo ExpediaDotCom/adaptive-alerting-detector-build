@@ -6,24 +6,32 @@ import numpy as np
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
-def test_get_calculate_sigma_for_integers():
+def test_calculate_sigma_for_integers():
     sample = [5, 4, 7, 9, 15, 1, 0]
     assert isclose(calculate_sigma(sample), 5.1130086, rel_tol=0.0001)
 
-def test_get_calculate_sigma_for_floats():
+def test_calculate_sigma_for_floats():
     sample = [35.2, 42.9, 37.8, 9.3, 15.0, 10.1, 20]
     assert isclose(calculate_sigma(sample), 14.015671, rel_tol=0.0001)
 
-def test_get_calculate_sigma_raises_error_for_single_value():
+def test_calculate_sigma_raises_error_for_single_value():
     sample = [35.2]
     with pytest.raises(Exception) as exception:
         assert isclose(calculate_sigma(sample), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
-def test_get_calculate_sigma_raises_error_with_empty_list():
+def test_calculate_sigma_raises_error_with_empty_list():
     with pytest.raises(Exception) as exception:
         assert isclose(calculate_sigma([]), 0)
     assert str(exception.value) == "Sample must have at least two elements"
+
+def test_calculate_sigma_thresholds():
+    sigma = 5
+    mean = 10
+    multiplier = 3
+    upper, lower = calculate_sigma_thresholds(sigma, mean, multiplier)
+    assert upper == 25   # 10 + 5 * 3; mean + sigma * multiplier
+    assert lower == -5   # 10 - 5 * 3; mean - sigma * multiplier
 
 def test_calculate_quartiles():
     sample = [2, 5, 6, 7, 10, 22, 13, 14, 16, 65, 45, 12]
@@ -53,6 +61,11 @@ def calculate_sigma(sample):
         raise Exception("Sample must have at least two elements")
     array = np.array(sample)
     return np.std(array, ddof=1)
+
+def calculate_sigma_thresholds(sigma, mean, multiplier):
+    upper = mean + sigma * multiplier
+    lower = mean - sigma * multiplier
+    return upper, lower
 
 def calculate_quartiles(sample):
     array = np.array(sample)
