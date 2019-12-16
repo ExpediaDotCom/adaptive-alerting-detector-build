@@ -25,6 +25,14 @@ def test_calculate_sigma_raises_error_with_empty_list():
         assert isclose(calculate_sigma([]), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
+def test_calculate_mean_for_floats():
+    sample = [35.2, 42.9, 37.8, 9.3, 15.0, 10.1, 20]
+    assert isclose(calculate_mean(sample), 24.328571, rel_tol=0.0001)
+
+def test_calculate_mean_for_single_value():
+    sample = [35.2]
+    assert isclose(calculate_mean(sample), 35.2, rel_tol=0.0001)
+
 def test_calculate_sigma_thresholds():
     sigma = 5
     mean = 10
@@ -39,6 +47,13 @@ def test_calculate_quartiles():
     assert q1 == 6.5
     assert median == 12.5
     assert q3 == 19.0
+
+def test_calculate_quartiles_for_single_value():
+    sample = [2]
+    q1, median, q3 = calculate_quartiles(sample)
+    assert q1 == 2
+    assert median == 2
+    assert q3 == 2
 
 def test_calculate_quartile_thresholds():
     q1, q3 = 2, 5
@@ -61,6 +76,10 @@ def calculate_sigma(sample):
         raise Exception("Sample must have at least two elements")
     array = np.array(sample)
     return np.std(array, ddof=1)
+
+def calculate_mean(sample):
+    array = np.array(sample)
+    return np.mean(array)
 
 def calculate_sigma_thresholds(sigma, mean, multiplier):
     upper = mean + sigma * multiplier
