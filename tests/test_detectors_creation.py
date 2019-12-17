@@ -58,7 +58,21 @@ def test_calculate_quartile_thresholds():
     assert upper == 9.5 # (q3 + (q3 - q1) * 1.5)
     assert lower == -2.5 # (q1 - (q3 - q1) * 1.5)
 
-# TODO: weak and strong outliers, using provided multiplier
-# using sigmas to find outliers
-# using percentiles to find outliers
-
+def test_create_detector_with_sigma_strategy():
+    sample = [5, 4, 7, 9, 15, 1, 0]
+    weak_multiplier = 3
+    strong_multiplier = 5
+    trainer = tr.ConstantThresholdDetectorTrainer()
+    detector = trainer.get_detector(trainer.Strategy.SIGMA, sample, weak_multiplier,
+            strong_multiplier)
+    assert detector is not None
+    print(detector)
+    assert detector.training_strategy == trainer.Strategy.SIGMA
+    assert detector.weak_multiplier == 3
+    assert detector.strong_multiplier == 5
+    assert isclose(detector.sigma, 5.1130086, rel_tol=0.0001)
+    assert isclose(detector.mean, 5.8571428, rel_tol=0.0001)
+    assert isclose(detector.weak_upper_threshold, 21.196168, rel_tol=0.0001)
+    assert isclose(detector.strong_upper_threshold, 31.422185, rel_tol=0.0001)
+    assert isclose(detector.weak_lower_threshold, -9.481883, rel_tol=0.0001)
+    assert isclose(detector.strong_lower_threshold, -19.70790, rel_tol=0.0001)

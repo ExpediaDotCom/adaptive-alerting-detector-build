@@ -1,8 +1,60 @@
+from enum import Enum
 import logging
 import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
+
+class Detector:
+    def __init__(self, training_strategy, weak_multiplier, strong_multiplier, sigma, mean,
+                 weak_upper_threshold, strong_upper_threshold, weak_lower_threshold,
+                 strong_lower_threshold):
+    # TODO: Convert to **kwargs
+        self.training_strategy = training_strategy
+        self.weak_multiplier = weak_multiplier
+        self.strong_multiplier = strong_multiplier
+        self.sigma = sigma
+        self.mean = mean
+        self.weak_upper_threshold = weak_upper_threshold
+        self.strong_upper_threshold = strong_upper_threshold
+        self.weak_lower_threshold = weak_lower_threshold
+        self.strong_lower_threshold = strong_lower_threshold
+
+
+class DetectorTrainer:
+    pass
+
+class ConstantThresholdDetectorTrainer(DetectorTrainer):
+    class Strategy(Enum):
+        SIGMA = "sigma"
+        QUARTILE = "quartile"
+
+    def get_detector(self, strategy, sample, weak_multiplier, strong_multiplier):
+        if strategy == self.Strategy.SIGMA:
+            return self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
+        if strategy == self.Strategy.QUARTILE:
+            # TODO: Implement
+            return
+        raise Exception("Unknown training strategy")
+        # TODO: Raise customized exception
+
+    def _create_sigma_detector(self, sample, weak_multiplier, strong_multiplier):
+        STRATEGY = self.Strategy.SIGMA
+
+        sigma = calculate_sigma(sample)
+        mean = calculate_mean(sample)
+        weak_upper_threshold, weak_lower_threshold = calculate_sigma_thresholds(
+            sigma, mean, weak_multiplier)
+        strong_upper_threshold, strong_lower_threshold = calculate_sigma_thresholds(
+            sigma, mean, strong_multiplier)
+
+        return Detector(STRATEGY, weak_multiplier, strong_multiplier, sigma, mean,
+                        weak_upper_threshold, strong_upper_threshold,
+                        weak_lower_threshold, strong_lower_threshold)
+
+    def _create_quartile_detector(self, sample, weak_multiplier, strong_multiplier):
+        pass
+
 
 def calculate_sigma(sample):
     if len(sample) < 2:
@@ -29,3 +81,6 @@ def calculate_quartile_thresholds(q1, q3, multiplier):
     lower = q1 - iqr * multiplier
     return upper, lower
 
+
+# TODO: Add descriptions for method arguments
+# TODO: Add quartile detector implementation
