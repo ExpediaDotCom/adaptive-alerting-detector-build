@@ -1,11 +1,6 @@
-import logging
 from math import isclose
 import pytest
-import numpy as np
 from adaptivealerting.trainers import trainers as tr
-
-logging.basicConfig(level=logging.INFO)
-LOGGER = logging.getLogger(__name__)
 
 def test_calculate_sigma_for_integers():
     sample = [5, 4, 7, 9, 15, 1, 0]
