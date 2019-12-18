@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+dataclasses = {version = ">=0.6",python_version = "< 3.7"}
+attrs = "*"
+
+[dev-packages]
+pytest = "*"
+pylint = "*"
+pipenv-setup = "*"
+pytest-cov = "*"
+
+[requires]
+python_version = "3.7"
