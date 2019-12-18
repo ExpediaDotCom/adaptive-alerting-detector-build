@@ -65,14 +65,25 @@ def test_create_detector_with_sigma_strategy():
     trainer = tr.ConstantThresholdDetectorTrainer()
     detector = trainer.get_detector(trainer.Strategy.SIGMA, sample, weak_multiplier,
             strong_multiplier)
-    assert detector is not None
-    print(detector)
     assert detector.training_strategy == trainer.Strategy.SIGMA
     assert detector.weak_multiplier == 3
     assert detector.strong_multiplier == 5
-    assert isclose(detector.sigma, 5.1130086, rel_tol=0.0001)
-    assert isclose(detector.mean, 5.8571428, rel_tol=0.0001)
     assert isclose(detector.weak_upper_threshold, 21.196168, rel_tol=0.0001)
     assert isclose(detector.strong_upper_threshold, 31.422185, rel_tol=0.0001)
     assert isclose(detector.weak_lower_threshold, -9.481883, rel_tol=0.0001)
     assert isclose(detector.strong_lower_threshold, -19.70790, rel_tol=0.0001)
+
+def test_create_detector_with_quartile_strategy():
+    sample = [5, 4, 7, 9, 15, 1, 0]
+    weak_multiplier = 1.5
+    strong_multiplier = 3.0
+    trainer = tr.ConstantThresholdDetectorTrainer()
+    detector = trainer.get_detector(trainer.Strategy.QUARTILE, sample, weak_multiplier,
+            strong_multiplier)
+    assert detector.training_strategy == trainer.Strategy.QUARTILE
+    assert detector.weak_multiplier == 1.5
+    assert detector.strong_multiplier == 3.0
+    assert detector.weak_upper_threshold == 16.25
+    assert detector.strong_upper_threshold == 24.5
+    assert detector.weak_lower_threshold == -5.75
+    assert detector.strong_lower_threshold == -14

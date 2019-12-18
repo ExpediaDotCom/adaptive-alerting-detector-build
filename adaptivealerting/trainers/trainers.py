@@ -6,15 +6,13 @@ logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 class Detector:
-    def __init__(self, training_strategy, weak_multiplier, strong_multiplier, sigma, mean,
+    def __init__(self, training_strategy, weak_multiplier, strong_multiplier,
                  weak_upper_threshold, strong_upper_threshold, weak_lower_threshold,
                  strong_lower_threshold):
     # TODO: Convert to **kwargs
         self.training_strategy = training_strategy
         self.weak_multiplier = weak_multiplier
         self.strong_multiplier = strong_multiplier
-        self.sigma = sigma
-        self.mean = mean
         self.weak_upper_threshold = weak_upper_threshold
         self.strong_upper_threshold = strong_upper_threshold
         self.weak_lower_threshold = weak_lower_threshold
@@ -33,8 +31,7 @@ class ConstantThresholdDetectorTrainer(DetectorTrainer):
         if strategy == self.Strategy.SIGMA:
             return self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
         if strategy == self.Strategy.QUARTILE:
-            # TODO: Implement
-            return
+            return self._create_quartile_detector(sample, weak_multiplier, strong_multiplier)
         raise Exception("Unknown training strategy")
         # TODO: Raise customized exception
 
@@ -48,12 +45,22 @@ class ConstantThresholdDetectorTrainer(DetectorTrainer):
         strong_upper_threshold, strong_lower_threshold = calculate_sigma_thresholds(
             sigma, mean, strong_multiplier)
 
-        return Detector(STRATEGY, weak_multiplier, strong_multiplier, sigma, mean,
+        return Detector(STRATEGY, weak_multiplier, strong_multiplier,
                         weak_upper_threshold, strong_upper_threshold,
                         weak_lower_threshold, strong_lower_threshold)
 
     def _create_quartile_detector(self, sample, weak_multiplier, strong_multiplier):
-        pass
+        STRATEGY = self.Strategy.QUARTILE
+
+        q1, median, q3 = calculate_quartiles(sample)
+        weak_upper_threshold, weak_lower_threshold = calculate_quartile_thresholds(q1, q3,
+                weak_multiplier)
+        strong_upper_threshold, strong_lower_threshold = calculate_quartile_thresholds(q1, q3,
+                strong_multiplier)
+
+        return Detector(STRATEGY, weak_multiplier, strong_multiplier,
+                        weak_upper_threshold, strong_upper_threshold,
+                        weak_lower_threshold, strong_lower_threshold)
 
 
 def calculate_sigma(sample):
@@ -72,6 +79,9 @@ def calculate_sigma_thresholds(sigma, mean, multiplier):
     return upper, lower
 
 def calculate_quartiles(sample):
+    ''' Note that "quartiles" are calculated using 25th, 50th, and 75th percentile, and may differ than
+    quartiles calculated manually.
+    '''
     array = np.array(sample)
     return np.percentile(array, [25, 50, 75], interpolation='midpoint')
 
@@ -83,4 +93,4 @@ def calculate_quartile_thresholds(q1, q3, multiplier):
 
 
 # TODO: Add descriptions for method arguments
-# TODO: Add quartile detector implementation
+# TODO: Add logging
