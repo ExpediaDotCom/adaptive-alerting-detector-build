@@ -6,11 +6,11 @@ logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 class Detector:
-    def __init__(self, training_strategy, weak_multiplier, strong_multiplier,
+    def __init__(self, build_strategy, weak_multiplier, strong_multiplier,
                  weak_upper_threshold, strong_upper_threshold, weak_lower_threshold,
                  strong_lower_threshold):
     # TODO: Convert to **kwargs
-        self.training_strategy = training_strategy
+        self.build_strategy = build_strategy
         self.weak_multiplier = weak_multiplier
         self.strong_multiplier = strong_multiplier
         self.weak_upper_threshold = weak_upper_threshold
@@ -19,10 +19,10 @@ class Detector:
         self.strong_lower_threshold = strong_lower_threshold
 
 
-class DetectorTrainer:
+class DetectorBuilder:
     pass
 
-class ConstantThresholdDetectorTrainer(DetectorTrainer):
+class ConstantThresholdDetectorBuilder(DetectorBuilder):
     class Strategy(Enum):
         SIGMA = "sigma"
         QUARTILE = "quartile"
@@ -32,7 +32,7 @@ class ConstantThresholdDetectorTrainer(DetectorTrainer):
             return self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
         if strategy == self.Strategy.QUARTILE:
             return self._create_quartile_detector(sample, weak_multiplier, strong_multiplier)
-        raise Exception("Unknown training strategy")
+        raise Exception("Unknown building strategy")
         # TODO: Raise customized exception
 
     def _create_sigma_detector(self, sample, weak_multiplier, strong_multiplier):
@@ -94,3 +94,4 @@ def calculate_quartile_thresholds(q1, q3, multiplier):
 
 # TODO: Add descriptions for method arguments
 # TODO: Add logging
+# TODO: Is "strategy" the correct term?
