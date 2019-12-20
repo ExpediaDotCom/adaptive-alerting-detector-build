@@ -6,6 +6,11 @@ verify_ssl = true
 [packages]
 dataclasses = {version = ">=0.6",python_version = "< 3.7"}
 attrs = "*"
+adaptivealerting = {git = "https://github.com/ExpediaDotCom/adaptive-alerting-detector-build.git"}
+matplotlib = "*"
+numpy = "*"
+pandas = "*"
+statsmodels = "*"
 
 [dev-packages]
 pytest = "*"
