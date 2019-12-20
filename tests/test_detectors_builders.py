@@ -1,3 +1,5 @@
+"""Tests for Detectors Builders module."""
+
 from math import isclose
 import pytest
 from adaptivealerting.detectors import builders
@@ -63,8 +65,8 @@ def test_create_detector_with_sigma_strategy():
     weak_multiplier = 3
     strong_multiplier = 5
     ct_builder = builders.ConstantThresholdDetectorBuilder()
-    detector = ct_builder.get_detector(ct_builder.Strategy.SIGMA, sample, weak_multiplier,
-            strong_multiplier)
+    detector = ct_builder.detector(ct_builder.Strategy.SIGMA, sample, weak_multiplier,
+                                       strong_multiplier)
     assert detector.build_strategy == ct_builder.Strategy.SIGMA
     assert detector.weak_multiplier == 3
     assert detector.strong_multiplier == 5
@@ -78,8 +80,8 @@ def test_create_detector_with_quartile_strategy():
     weak_multiplier = 1.5
     strong_multiplier = 3.0
     ct_builder = builders.ConstantThresholdDetectorBuilder()
-    detector = ct_builder.get_detector(ct_builder.Strategy.QUARTILE, sample, weak_multiplier,
-            strong_multiplier)
+    detector = ct_builder.detector(ct_builder.Strategy.QUARTILE, sample, weak_multiplier,
+                                       strong_multiplier)
     assert detector.build_strategy == ct_builder.Strategy.QUARTILE
     assert detector.weak_multiplier == 1.5
     assert detector.strong_multiplier == 3.0
@@ -87,3 +89,5 @@ def test_create_detector_with_quartile_strategy():
     assert detector.strong_upper_threshold == 24.5
     assert detector.weak_lower_threshold == -5.75
     assert detector.strong_lower_threshold == -14
+
+#TODO: test exception for invalid sample
