@@ -1,0 +1,18 @@
+Metadata-Version: 1.1
+Name: adaptive-alerting-detector-build
+Version: 0.0.1
+Summary: Adaptive Alerting Detector Build
+Home-page: https://github.com/ExpediaDotCom/adaptive-alerting-detector-build
+Author: Expedia Group
+Author-email: adaptive-alerting@expediagroup.com
+License: Apache License 2.0
+Description: # adaptive-alerting-detector-build
+        
+        Adaptive Alerting Python Library
+        
+        ```
+        pip install git+https://github.com/ExpediaDotCom/adaptive-alerting-detector-build.git#egg=adaptivealerting
+        ```
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3

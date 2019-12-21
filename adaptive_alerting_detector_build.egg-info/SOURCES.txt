@@ -1,0 +1,7 @@
+README.md
+setup.py
+adaptive_alerting_detector_build.egg-info/PKG-INFO
+adaptive_alerting_detector_build.egg-info/SOURCES.txt
+adaptive_alerting_detector_build.egg-info/dependency_links.txt
+adaptive_alerting_detector_build.egg-info/requires.txt
+adaptive_alerting_detector_build.egg-info/top_level.txt

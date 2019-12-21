@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8ad49a4ab883a1393bd687170bbcd7a00836f6e1132e401f0b4bda83bc8dfe9d"
+            "sha256": "e0223dac64f0732e643282f7b24ac0a8a29ccc3045c80cdbdc0bcd657e411fef"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,10 +16,6 @@
         ]
     },
     "default": {
-        "adaptivealerting": {
-            "git": "https://github.com/ExpediaDotCom/adaptive-alerting-detector-build.git",
-            "ref": "75dde18dec584185727c679d3a47c54146682edb"
-        },
         "attrs": {
             "hashes": [
                 "sha256:08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c",
@@ -247,6 +243,10 @@
         }
     },
     "develop": {
+        "adaptive-alerting-detector-build": {
+            "editable": true,
+            "path": "."
+        },
         "appdirs": {
             "hashes": [
                 "sha256:9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92",
@@ -353,6 +353,14 @@
                 "sha256:fec32646b98baf4a22fdceb08703965bd16dea09051fbeb31a04b5b6e72b846c"
             ],
             "version": "==5.0"
+        },
+        "dataclasses": {
+            "hashes": [
+                "sha256:454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f",
+                "sha256:6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84"
+            ],
+            "index": "pypi",
+            "version": "==0.6"
         },
         "distlib": {
             "hashes": [
