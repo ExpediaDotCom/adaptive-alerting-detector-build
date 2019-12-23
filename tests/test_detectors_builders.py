@@ -99,4 +99,12 @@ def test_create_detector_with_invalid_strategy_raises_build_error():
         detector = ct_builder.detector("invalid strategy", sample, weak_multiplier, strong_multiplier)
     assert str(exception.value) == "Unknown build strategy"
 
-#TODO: test exception for invalid sample
+def test_create_detector_with_invalid_sample_size_raises_build_error():
+    sample = [5]
+    weak_multiplier = 3
+    strong_multiplier = 5
+    ct_builder = ct.ConstantThresholdDetectorBuilder()
+    with pytest.raises(exceptions.DetectorBuilderError) as exception:
+        detector = ct_builder.detector(ct_builder.Strategy.SIGMA, sample, weak_multiplier,
+                                       strong_multiplier)
+    assert str(exception.value) == "Sample must have at least two elements"
