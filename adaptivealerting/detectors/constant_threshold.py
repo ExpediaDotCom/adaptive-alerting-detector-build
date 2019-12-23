@@ -18,8 +18,8 @@ class ConstantThresholdDetector(base.Detector):
         self.strong_lower_threshold = strong_lower_threshold
 
     def __str__(self):
-        return f"Strategy: {self.build_strategy}\n \
-                Weak upper threshold: {self.weak_upper_threshold}\n \
-                Strong upper threshold: {self.strong_upper_threshold}\n \
-                Weak lower threshold: {self.weak_lower_threshold}\n \
-                Strong lower threshold: {self.strong_lower_threshold}"
+        return f"Strategy: {self.build_strategy}, " + \
+               f"Weak upper threshold: {self.weak_upper_threshold}, " + \
+               f"Strong upper threshold: {self.strong_upper_threshold}, " + \
+               f"Weak lower threshold: {self.weak_lower_threshold}, " + \
+               f"Strong lower threshold: {self.strong_lower_threshold}"
