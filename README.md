@@ -25,3 +25,17 @@ $ pytest -s
 ```
 $ make build
 ```
+# Development Environment
+## Build
+### Install `pipenv`
+
+ ```$ brew install pipenv```
+
+### Setup environment
+
+```$ make install```
+
+## Test
+
+```$ make test```
+
