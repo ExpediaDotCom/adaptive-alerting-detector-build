@@ -126,7 +126,7 @@ def calculate_sigma(sample):
     """
 
     if len(sample) < 2:
-        raise Exception("Sample must have at least two elements")
+        raise exceptions.DetectorBuilderError("Sample must have at least two elements")
     array = np.array(sample)
     return np.std(array, ddof=1)
 
