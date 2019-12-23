@@ -1,46 +1,22 @@
 """
-Detectors builders module.
+Constant threshold detectors builders module.
 
-This module provides functions to build detectors that fit the provided metrics data.
+This module provides functions to build constant threshold detectors that fit the provided metrics
+data.
 """
 
 from enum import Enum
 import logging
 import numpy as np
+from adaptivealerting.detectors import constant_threshold as ct
+from adaptivealerting.detectors.builders import exceptions
+from adaptivealerting.detectors.builders import base as builders
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
-class DetectorBuilderError(Exception):
-    """Base class for detector builder errors."""
-    pass
 
-class Detector:
-    """Detector that is used by Adaptive Alerting to find anomalies.
-
-    Detector model contains thresholds for weak and strong anomalies.
-
-    Arguments:
-
-    """
-    def __init__(self, build_strategy, weak_multiplier, strong_multiplier,
-                 weak_upper_threshold, strong_upper_threshold, weak_lower_threshold,
-                 strong_lower_threshold):
-    # TODO: Convert to **kwargs
-        self.build_strategy = build_strategy
-        self.weak_multiplier = weak_multiplier
-        self.strong_multiplier = strong_multiplier
-        self.weak_upper_threshold = weak_upper_threshold
-        self.strong_upper_threshold = strong_upper_threshold
-        self.weak_lower_threshold = weak_lower_threshold
-        self.strong_lower_threshold = strong_lower_threshold
-
-
-class DetectorBuilder:
-    """Base class for detectors builders."""
-    pass
-
-class ConstantThresholdDetectorBuilder(DetectorBuilder):
+class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
     """Constant Threshold Detectors Builder class.
 
     This class provides methods to return a Detector object that fits provided metrics data, using
@@ -63,7 +39,7 @@ class ConstantThresholdDetectorBuilder(DetectorBuilder):
         Calculations are performed on the provided data using the specified strategy, to determine
         weak and strong thresholds.
 
-        Arguments:
+        Parameters:
             strategy: the strategy to use to determine thresholds; must be one from the Strategy
                       class
             sample: list of number data on which calculations are performed
@@ -80,12 +56,12 @@ class ConstantThresholdDetectorBuilder(DetectorBuilder):
             return self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
         if strategy == self.Strategy.QUARTILE:
             return self._create_quartile_detector(sample, weak_multiplier, strong_multiplier)
-        raise DetectorBuilderError("Unknown build strategy")
+        raise exceptions.DetectorBuilderError("Unknown build strategy")
 
     def _create_sigma_detector(self, sample, weak_multiplier, strong_multiplier):
         """Performs threshold calculations using sigma (standard deviation) strategy.
 
-        Arguments:
+        Parameters:
             sample: list of number data on which calculations are performed
             weak_multiplier: number that represents to multiplier to use to calculate weak
                              thresholds
@@ -105,14 +81,14 @@ class ConstantThresholdDetectorBuilder(DetectorBuilder):
         strong_upper_threshold, strong_lower_threshold = calculate_sigma_thresholds(
             sigma, mean, strong_multiplier)
 
-        return Detector(STRATEGY, weak_multiplier, strong_multiplier,
+        return ct.ConstantThresholdDetector(STRATEGY, weak_multiplier, strong_multiplier,
                         weak_upper_threshold, strong_upper_threshold,
                         weak_lower_threshold, strong_lower_threshold)
 
     def _create_quartile_detector(self, sample, weak_multiplier, strong_multiplier):
         """Performs threshold calculations using quartile strategy.
 
-        Arguments:
+        Parameters:
             sample: list of number data on which calculations are performed
             weak_multiplier: number that represents to multiplier to use to calculate weak
                              thresholds
@@ -131,7 +107,7 @@ class ConstantThresholdDetectorBuilder(DetectorBuilder):
         strong_upper_threshold, strong_lower_threshold = \
                 calculate_quartile_thresholds(q1, q3, strong_multiplier)
 
-        return Detector(STRATEGY, weak_multiplier, strong_multiplier,
+        return ct.ConstantThresholdDetector(STRATEGY, weak_multiplier, strong_multiplier,
                         weak_upper_threshold, strong_upper_threshold,
                         weak_lower_threshold, strong_lower_threshold)
 
@@ -139,7 +115,7 @@ class ConstantThresholdDetectorBuilder(DetectorBuilder):
 def calculate_sigma(sample):
     """Calculates and returns the sigma (standard deviation) of the provided sample.
 
-    Arguments:
+    Parameters:
         sample: list of number data on which calculations are performed
     """
 
@@ -151,7 +127,7 @@ def calculate_sigma(sample):
 def calculate_mean(sample):
     """Calculates and returns the mean of the provided sample.
 
-    Arguments:
+    Parameters:
         sample: list of number data on which calculations are performed
     """
 
@@ -161,7 +137,7 @@ def calculate_mean(sample):
 def calculate_sigma_thresholds(sigma, mean, multiplier):
     """Calculates and returns the thresholds using sigmas.
 
-    Arguments:
+    Parameters:
         sigma: standard deviation value
         mean: mean of the provided sample
         multiplier: number by which to multiply the sigma to add/subtract from the mean
@@ -180,7 +156,7 @@ def calculate_quartiles(sample):
     Note that "quartiles" are calculated using 25th, 50th, and 75th percentile, and may differ than
     quartiles calculated manually.
 
-    Arguments:
+    Parameters:
         sample: list of number data on which calculations are performed
 
     Returns:
@@ -193,7 +169,7 @@ def calculate_quartiles(sample):
 def calculate_quartile_thresholds(q1, q3, multiplier):
     """Calculates and returns the thresholds using quartiles.
 
-    Arguments:
+    Parameters:
         q1: first quartile value
         q3: third quartile value
         multiplier: number by which to multiply the inter-quartile-range to add/subtract from the
