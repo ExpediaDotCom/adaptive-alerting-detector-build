@@ -81,8 +81,12 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
         strong_upper_threshold, strong_lower_threshold = calculate_sigma_thresholds(
             sigma, mean, strong_multiplier)
 
-        return ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold, strong_upper_threshold,
-                                            weak_lower_threshold, strong_lower_threshold)
+        detector = ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold,
+                                                strong_upper_threshold, weak_lower_threshold,
+                                                strong_lower_threshold)
+        LOGGER.info("Detector created -- %s", detector)
+
+        return detector
 
     def _create_quartile_detector(self, sample, weak_multiplier, strong_multiplier):
         """Performs threshold calculations using quartile strategy.
@@ -106,8 +110,12 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
         strong_upper_threshold, strong_lower_threshold = \
                 calculate_quartile_thresholds(q1, q3, strong_multiplier)
 
-        return ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold, strong_upper_threshold,
-                                            weak_lower_threshold, strong_lower_threshold)
+        detector = ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold,
+                                                strong_upper_threshold, weak_lower_threshold,
+                                                strong_lower_threshold)
+        LOGGER.info("Detector created -- %s", detector)
+
+        return detector
 
 
 def calculate_sigma(sample):
@@ -181,6 +189,3 @@ def calculate_quartile_thresholds(q1, q3, multiplier):
     upper = q3 + iqr * multiplier
     lower = q1 - iqr * multiplier
     return upper, lower
-
-
-# TODO: Add logging
