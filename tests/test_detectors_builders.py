@@ -1,9 +1,10 @@
 """Tests for Detectors Builders module."""
 
 from math import isclose
-import pytest
 from re import search
+import pytest
 from adaptivealerting.detectors.builders import constant_threshold as ct
+from adaptivealerting.detectors.builders import exceptions
 
 def test_calculate_sigma_for_integers():
     sample = [5, 4, 7, 9, 15, 1, 0]
@@ -15,12 +16,12 @@ def test_calculate_sigma_for_floats():
 
 def test_calculate_sigma_raises_error_for_single_value():
     sample = [35.2]
-    with pytest.raises(Exception) as exception:
+    with pytest.raises(exceptions.DetectorBuilderError) as exception:
         assert isclose(ct.calculate_sigma(sample), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
 def test_calculate_sigma_raises_error_with_empty_list():
-    with pytest.raises(Exception) as exception:
+    with pytest.raises(exceptions.DetectorBuilderError) as exception:
         assert isclose(ct.calculate_sigma([]), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
