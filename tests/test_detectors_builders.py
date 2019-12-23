@@ -2,6 +2,7 @@
 
 from math import isclose
 import pytest
+from re import search
 from adaptivealerting.detectors.builders import constant_threshold as ct
 
 def test_calculate_sigma_for_integers():
@@ -66,12 +67,13 @@ def test_create_detector_with_sigma_strategy():
     strong_multiplier = 5
     ct_builder = ct.ConstantThresholdDetectorBuilder()
     detector = ct_builder.detector(ct_builder.Strategy.SIGMA, sample, weak_multiplier,
-                                       strong_multiplier)
+                                   strong_multiplier)
     assert detector.build_strategy == ct_builder.Strategy.SIGMA
     assert isclose(detector.weak_upper_threshold, 21.196168, rel_tol=0.0001)
     assert isclose(detector.strong_upper_threshold, 31.422185, rel_tol=0.0001)
     assert isclose(detector.weak_lower_threshold, -9.481883, rel_tol=0.0001)
     assert isclose(detector.strong_lower_threshold, -19.70790, rel_tol=0.0001)
+    assert search("^Strategy: Strategy.SIGMA", str(detector))
 
 def test_create_detector_with_quartile_strategy():
     sample = [5, 4, 7, 9, 15, 1, 0]
@@ -79,11 +81,12 @@ def test_create_detector_with_quartile_strategy():
     strong_multiplier = 3.0
     ct_builder = ct.ConstantThresholdDetectorBuilder()
     detector = ct_builder.detector(ct_builder.Strategy.QUARTILE, sample, weak_multiplier,
-                                       strong_multiplier)
+                                   strong_multiplier)
     assert detector.build_strategy == ct_builder.Strategy.QUARTILE
     assert detector.weak_upper_threshold == 16.25
     assert detector.strong_upper_threshold == 24.5
     assert detector.weak_lower_threshold == -5.75
     assert detector.strong_lower_threshold == -14
+    assert search("^Strategy: Strategy.QUARTILE", str(detector))
 
 #TODO: test exception for invalid sample
