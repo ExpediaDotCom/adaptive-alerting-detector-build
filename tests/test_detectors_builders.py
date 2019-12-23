@@ -68,8 +68,6 @@ def test_create_detector_with_sigma_strategy():
     detector = ct_builder.detector(ct_builder.Strategy.SIGMA, sample, weak_multiplier,
                                        strong_multiplier)
     assert detector.build_strategy == ct_builder.Strategy.SIGMA
-    assert detector.weak_multiplier == 3
-    assert detector.strong_multiplier == 5
     assert isclose(detector.weak_upper_threshold, 21.196168, rel_tol=0.0001)
     assert isclose(detector.strong_upper_threshold, 31.422185, rel_tol=0.0001)
     assert isclose(detector.weak_lower_threshold, -9.481883, rel_tol=0.0001)
@@ -83,8 +81,6 @@ def test_create_detector_with_quartile_strategy():
     detector = ct_builder.detector(ct_builder.Strategy.QUARTILE, sample, weak_multiplier,
                                        strong_multiplier)
     assert detector.build_strategy == ct_builder.Strategy.QUARTILE
-    assert detector.weak_multiplier == 1.5
-    assert detector.strong_multiplier == 3.0
     assert detector.weak_upper_threshold == 16.25
     assert detector.strong_upper_threshold == 24.5
     assert detector.weak_lower_threshold == -5.75
