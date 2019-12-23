@@ -90,4 +90,13 @@ def test_create_detector_with_quartile_strategy():
     assert detector.strong_lower_threshold == -14
     assert search("^Strategy: Strategy.QUARTILE", str(detector))
 
+def test_create_detector_with_invalid_strategy_raises_build_error():
+    sample = [5, 4, 7, 9, 15, 1, 0]
+    weak_multiplier = 1.5
+    strong_multiplier = 3.0
+    ct_builder = ct.ConstantThresholdDetectorBuilder()
+    with pytest.raises(exceptions.DetectorBuilderError) as exception:
+        detector = ct_builder.detector("invalid strategy", sample, weak_multiplier, strong_multiplier)
+    assert str(exception.value) == "Unknown build strategy"
+
 #TODO: test exception for invalid sample
