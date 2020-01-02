@@ -6,12 +6,17 @@ verify_ssl = true
 [packages]
 dataclasses = {version = ">=0.6",python_version = "< 3.7"}
 attrs = "*"
+matplotlib = "*"
+numpy = "*"
+pandas = "*"
+statsmodels = "*"
 
 [dev-packages]
 pytest = "*"
 pylint = "*"
 pipenv-setup = "*"
 pytest-cov = "*"
+adaptive-alerting-detector-build = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"
