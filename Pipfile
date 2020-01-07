@@ -11,6 +11,7 @@ numpy = "*"
 pandas = "*"
 statsmodels = "*"
 seaborn = "*"
+adaptive-alerting-detector-build = {git = "https://github.com/ExpediaDotCom/adaptive-alerting-detector-build.git",ref = "master"}
 
 [dev-packages]
 pytest = "*"

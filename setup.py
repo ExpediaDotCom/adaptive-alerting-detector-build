@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import io
 
 setup(
-    name="adaptive-alerting-detector-build",
+    name="adaptive_alerting_detector_build",
     version="0.0.1",
     description="Adaptive Alerting Detector Build",
     long_description=io.open("README.md", encoding="utf-8").read(),
