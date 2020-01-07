@@ -1,9 +1,9 @@
 # from abc import ABCMeta, abstractmethod
 import attr
-from adaptivealerting.utils import validate
+from adaptive_alerting_detector_build.utils import validate
 from types import FunctionType
 
-# from adaptivealerting.detectors import model
+# from adaptive_alerting_detector_build.detectors import model
 
 
 @attr.s

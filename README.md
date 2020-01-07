@@ -19,3 +19,9 @@ $ pipenv shell
 ```
 $ pytest -s
 ```
+
+## Build
+
+```
+$ make build
+```
