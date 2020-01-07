@@ -6,6 +6,7 @@ clean:
 
 .PHONY: build
 build:
+	pipenv lock --requirements > requirements.txt
 	pipenv install --dev
 	pipenv run pipenv-setup sync
 	test
@@ -18,11 +19,11 @@ install:
 
 .PHONY: test
 test:
-	pipenv run pytest --verbose --cov-report term --cov-report html:build/coverage --cov=adaptivealerting tests
+	pipenv run pytest --verbose --cov-report term --cov-report html:build/coverage --cov=adaptive_alerting_detector_build tests
 
 .PHONY: style
 style:
-	pipenv run black adaptivealerting --check
+	pipenv run black adaptive_alerting_detector_build --check
 
 .PHONY: publish
 publish:

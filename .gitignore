@@ -1,4 +1,11 @@
-build
-.coverage
-__pycache__
+# exclude hidden directories
 .*/
+
+# exclude compiled / build files
+**/__pycache__
+*.pyc
+*.egg-info/
+dist/
+build/
+.coverage
+.DS_Store
