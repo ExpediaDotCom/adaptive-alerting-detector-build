@@ -74,11 +74,11 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
 
         STRATEGY = self.Strategy.SIGMA
 
-        sigma = calculate_sigma(sample)
-        mean = calculate_mean(sample)
-        weak_upper_threshold, weak_lower_threshold = calculate_sigma_thresholds(
+        sigma = _calculate_sigma(sample)
+        mean = _calculate_mean(sample)
+        weak_upper_threshold, weak_lower_threshold = _calculate_sigma_thresholds(
             sigma, mean, weak_multiplier)
-        strong_upper_threshold, strong_lower_threshold = calculate_sigma_thresholds(
+        strong_upper_threshold, strong_lower_threshold = _calculate_sigma_thresholds(
             sigma, mean, strong_multiplier)
 
         detector = ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold,
@@ -104,11 +104,11 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
 
         STRATEGY = self.Strategy.QUARTILE
 
-        q1, median, q3 = calculate_quartiles(sample)
+        q1, median, q3 = _calculate_quartiles(sample)
         weak_upper_threshold, weak_lower_threshold = \
-                calculate_quartile_thresholds(q1, q3, weak_multiplier)
+                _calculate_quartile_thresholds(q1, q3, weak_multiplier)
         strong_upper_threshold, strong_lower_threshold = \
-                calculate_quartile_thresholds(q1, q3, strong_multiplier)
+                _calculate_quartile_thresholds(q1, q3, strong_multiplier)
 
         detector = ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold,
                                                 strong_upper_threshold, weak_lower_threshold,
@@ -118,7 +118,7 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
         return detector
 
 
-def calculate_sigma(sample):
+def _calculate_sigma(sample):
     """Calculates and returns the sigma (standard deviation) of the provided sample.
 
     Parameters:
@@ -130,7 +130,7 @@ def calculate_sigma(sample):
     array = np.array(sample)
     return np.std(array, ddof=1)
 
-def calculate_mean(sample):
+def _calculate_mean(sample):
     """Calculates and returns the mean of the provided sample.
 
     Parameters:
@@ -140,7 +140,7 @@ def calculate_mean(sample):
     array = np.array(sample)
     return np.mean(array)
 
-def calculate_sigma_thresholds(sigma, mean, multiplier):
+def _calculate_sigma_thresholds(sigma, mean, multiplier):
     """Calculates and returns the thresholds using sigmas.
 
     Parameters:
@@ -156,7 +156,7 @@ def calculate_sigma_thresholds(sigma, mean, multiplier):
     lower = mean - sigma * multiplier
     return upper, lower
 
-def calculate_quartiles(sample):
+def _calculate_quartiles(sample):
     """Calculates and returns quartiles for the provided sample.
 
     Note that "quartiles" are calculated using 25th, 50th, and 75th percentile, and may differ than
@@ -172,7 +172,7 @@ def calculate_quartiles(sample):
     array = np.array(sample)
     return np.percentile(array, [25, 50, 75], interpolation='midpoint')
 
-def calculate_quartile_thresholds(q1, q3, multiplier):
+def _calculate_quartile_thresholds(q1, q3, multiplier):
     """Calculates and returns the thresholds using quartiles.
 
     Parameters:
