@@ -3,8 +3,8 @@
 from math import isclose
 from re import search
 import pytest
-from adaptivealerting.detectors.builders import constant_threshold as ct
-from adaptivealerting.detectors.builders import exceptions
+from adaptive_alerting_detector_build.detectors.builders import constant_threshold as ct
+from adaptive_alerting_detector_build.detectors.builders import exceptions
 
 def test_calculate_sigma_for_integers():
     sample = [5, 4, 7, 9, 15, 1, 0]

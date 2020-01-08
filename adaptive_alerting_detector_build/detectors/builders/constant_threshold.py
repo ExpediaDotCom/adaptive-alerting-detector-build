@@ -8,9 +8,9 @@ data.
 from enum import Enum
 import logging
 import numpy as np
-from adaptivealerting.detectors import constant_threshold as ct
-from adaptivealerting.detectors.builders import exceptions
-from adaptivealerting.detectors.builders import base as builders
+from adaptive_alerting_detector_build.detectors import constant_threshold as ct
+from adaptive_alerting_detector_build.detectors.builders import exceptions
+from adaptive_alerting_detector_build.detectors.builders import base as builders
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)

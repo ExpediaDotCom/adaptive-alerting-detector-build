@@ -1,4 +1,4 @@
-from adaptivealerting.detectors import base
+from adaptive_alerting_detector_build.detectors import base
 
 class ConstantThresholdDetector(base.Detector):
     """Constant threshold detector that is used by Adaptive Alerting to find anomalies.
