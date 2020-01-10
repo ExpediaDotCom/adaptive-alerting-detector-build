@@ -5766,14 +5766,14 @@
         1578610680
       ]
     ], 
-    "target": "summarize(sumSeries(seriesByTag('elb=~hotel-infosite','what=elb_2xx')), \"1min\", \"sum\")", 
+    "target": "summarize(sumSeries(seriesByTag('elb=~my-app','what=elb_2xx')), \"1min\", \"sum\")", 
     "tags": {
       "aggregatedBy": "sum", 
       "what": "elb_2xx", 
       "m_account": "111248436868", 
-      "name": "sumSeries(seriesByTag('elb=~hotel-infosite','what=elb_2xx'))", 
+      "name": "sumSeries(seriesByTag('elb=~my-app','what=elb_2xx'))", 
       "interval": "60", 
-      "role": "hotel-infosite-web", 
+      "role": "my-app",
       "summarizeFunction": "sum", 
       "statistic": "sum", 
       "summarize": "1min", 
