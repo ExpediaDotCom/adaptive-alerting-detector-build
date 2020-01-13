@@ -1,5 +1,5 @@
 from adaptive_alerting_detector_build.exceptions import AdaptiveAlertingDetectorBuildError
-from .base import _datasource, DatasourceQueryException
+from .base import base_datasource, DatasourceQueryException
 from ._graphite import graphite
 
 

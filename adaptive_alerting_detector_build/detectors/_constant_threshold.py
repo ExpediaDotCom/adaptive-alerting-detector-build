@@ -10,10 +10,30 @@ import logging
 import numpy as np
 from adaptive_alerting_detector_build.detectors import base_detector
 from adaptive_alerting_detector_build.detectors import exceptions
-from .constant_threshold imoprt ConstantThresholdDetector as ct
+from .constant_threshold import ConstantThresholdDetector as ct
+import attr
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
+
+class constant_threshold_strategy(Enum):
+    """Constant threshold model fitting strategies"""
+
+    SIGMA = "sigma"
+    QUARTILE = "quartile"
+
+@attr.s
+class constant_threshold_training_metadata:
+    strategy = attr.ib(validator=attr.validators.in_(constant_threshold_strategy))
+    weak_multiplier = attr.ib(default=1)
+    strong_multiplier = attr.ib(default=1)
+
+@attr.s
+class constant_threshold_hyperparametrs:
+    weak_upper_threshold = attr.ib()
+    strong_upper_threshold = attr.ib()
+    weak_lower_threshold = attr.ib()
+    strong_lower_threshold = attr.ib()
 
 
 class constant_threshold(base_detector):
@@ -27,13 +47,9 @@ class constant_threshold(base_detector):
         - quartile
     """
 
-    class Strategy(Enum):
-        """Constant threshold model fitting strategies"""
 
-        SIGMA = "sigma"
-        QUARTILE = "quartile"
 
-    def __init__(self, strategy, sample, weak_multiplier, strong_multiplier, **kwargs):
+    def __init__(self, **kwargs):
         """Performs calculations and returns a detector object.
 
         Calculations are performed on the provided data using the specified strategy, to determine
@@ -51,45 +67,48 @@ class constant_threshold(base_detector):
         Returns:
             Detector object
         """
-        self.config = {}
-        if strategy == self.Strategy.SIGMA:
-            self.config = self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
-        if strategy == self.Strategy.QUARTILE:
-            self.config = self._create_quartile_detector(sample, weak_multiplier, strong_multiplier)
-        raise exceptions.DetectorBuilderError("Unknown build strategy")
+        self.training_metadata = constant_threshold_training_metadata(**kwargs['training_metadata'])
+        self.hyperparameters = None
         super(constant_threshold, self).__init__(**kwargs)
 
-    def _create_sigma_detector(self, sample, weak_multiplier, strong_multiplier):
+    def train(self):
+        # TODO: get data from datasource
+        sample = []
+        if self.training_metadata.strategy == "sigma":
+            self._train_sigma(sample)
+        elif self.training_metadata.strategy == "quartile":
+            self._train_quartile(sample)
+
+    def _train_sigma(self, sample):
         """Performs threshold calculations using sigma (standard deviation) strategy.
 
         Parameters:
             sample: list of number data on which calculations are performed
             weak_multiplier: number that represents to multiplier to use to calculate weak
-                             thresholds
+                            thresholds
             strong_multiplier: number that represents to multiplier to use to calculate strong
-                               thresholds
+                            thresholds
 
         Returns:
             Detector object
-       """
+        """
 
-        STRATEGY = self.Strategy.SIGMA
 
         sigma = _calculate_sigma(sample)
         mean = _calculate_mean(sample)
         weak_upper_threshold, weak_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, weak_multiplier)
+            sigma, mean, self.training_metadata.weak_multiplier)
         strong_upper_threshold, strong_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, strong_multiplier)
+            sigma, mean, self.training_metadata.strong_multiplier)
 
-        detector = ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold,
-                                                strong_upper_threshold, weak_lower_threshold,
-                                                strong_lower_threshold)
-        LOGGER.info("Detector created -- %s", detector)
+        self.hyperparameters = constant_threshold_hyperparametrs(
+            weak_upper_threshold,
+            strong_upper_threshold,
+            weak_lower_threshold,
+            weak_upper_threshold
+        )
 
-        return detector
-
-    def _create_quartile_detector(self, sample, weak_multiplier, strong_multiplier):
+    def _train_quartile(self, sample):
         """Performs threshold calculations using quartile strategy.
 
         Parameters:
@@ -102,21 +121,18 @@ class constant_threshold(base_detector):
         Returns:
             Detector object
        """
-
-        STRATEGY = self.Strategy.QUARTILE
-
         q1, median, q3 = _calculate_quartiles(sample)
         weak_upper_threshold, weak_lower_threshold = \
-                _calculate_quartile_thresholds(q1, q3, weak_multiplier)
+                _calculate_quartile_thresholds(q1, q3, self.training_metadata.weak_multiplier)
         strong_upper_threshold, strong_lower_threshold = \
-                _calculate_quartile_thresholds(q1, q3, strong_multiplier)
+                _calculate_quartile_thresholds(q1, q3, self.training_metadata.strong_multiplier)
 
-        detector = ct.ConstantThresholdDetector(STRATEGY, weak_upper_threshold,
-                                                strong_upper_threshold, weak_lower_threshold,
-                                                strong_lower_threshold)
-        LOGGER.info("Detector created -- %s", detector)
-
-        return detector
+        self.hyperparameters = constant_threshold_hyperparametrs(
+            weak_upper_threshold,
+            strong_upper_threshold,
+            weak_lower_threshold,
+            weak_upper_threshold
+        )
 
 
 def _calculate_sigma(sample):

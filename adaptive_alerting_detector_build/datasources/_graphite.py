@@ -1,8 +1,8 @@
 import requests
 import pandas as pd
-from adaptive_alerting_detector_build.datasources import _datasource, DatasourceQueryException
+from adaptive_alerting_detector_build.datasources import base_datasource, DatasourceQueryException
 
-class graphite(_datasource):
+class graphite(base_datasource):
 
     def __init__(self, url, **kwargs):
         self._url = url
