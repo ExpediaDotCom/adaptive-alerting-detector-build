@@ -8,15 +8,15 @@ data.
 from enum import Enum
 import logging
 import numpy as np
-from adaptive_alerting_detector_build.detectors import constant_threshold as ct
-from adaptive_alerting_detector_build.detectors.builders import exceptions
-from adaptive_alerting_detector_build.detectors.builders import base as builders
+from adaptive_alerting_detector_build.detectors import base_detector
+from adaptive_alerting_detector_build.detectors import exceptions
+from .constant_threshold imoprt ConstantThresholdDetector as ct
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 
-class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
+class constant_threshold(base_detector):
     """Constant Threshold Detectors Builder class.
 
     This class provides methods to return a Detector object that fits provided metrics data, using
@@ -33,7 +33,7 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
         SIGMA = "sigma"
         QUARTILE = "quartile"
 
-    def detector(self, strategy, sample, weak_multiplier, strong_multiplier):
+    def __init__(self, strategy, sample, weak_multiplier, strong_multiplier, **kwargs):
         """Performs calculations and returns a detector object.
 
         Calculations are performed on the provided data using the specified strategy, to determine
@@ -51,12 +51,13 @@ class ConstantThresholdDetectorBuilder(builders.DetectorBuilder):
         Returns:
             Detector object
         """
-
+        self.config = {}
         if strategy == self.Strategy.SIGMA:
-            return self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
+            self.config = self._create_sigma_detector(sample, weak_multiplier, strong_multiplier)
         if strategy == self.Strategy.QUARTILE:
-            return self._create_quartile_detector(sample, weak_multiplier, strong_multiplier)
+            self.config = self._create_quartile_detector(sample, weak_multiplier, strong_multiplier)
         raise exceptions.DetectorBuilderError("Unknown build strategy")
+        super(constant_threshold, self).__init__(**kwargs)
 
     def _create_sigma_detector(self, sample, weak_multiplier, strong_multiplier):
         """Performs threshold calculations using sigma (standard deviation) strategy.
