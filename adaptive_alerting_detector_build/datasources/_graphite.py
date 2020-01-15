@@ -24,8 +24,7 @@ class graphite(base_datasource):
                 'until': end,
                 'format': 'json'
             }
-            
-            response = requests.get(self._render_url, params=params, timeout=30)
+            response = requests.get(self._render_url, params=params, timeout=1)
             response.raise_for_status()
             data = map(lambda d: {"time": d[1], "value": d[0]}, response.json()[0]["datapoints"])
             df = pd.DataFrame(data, columns=["time", "value"])
