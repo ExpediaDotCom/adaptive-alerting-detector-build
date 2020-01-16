@@ -76,13 +76,12 @@ class constant_threshold(base_detector):
             hyperparameters = None
         )
 
-    def train(self):
-        sample = self.metric.query()
+    def train(self, data):
         strategy = self.config.training_metadata.strategy
         if strategy == constant_threshold_strategy.SIGMA:
-            self._train_sigma(sample)
+            self._train_sigma(data)
         elif strategy == constant_threshold_strategy.QUARTILE:
-            self._train_quartile(sample)
+            self._train_quartile(data)
 
     def _train_sigma(self, sample):
         """Performs threshold calculations using sigma (standard deviation) strategy.

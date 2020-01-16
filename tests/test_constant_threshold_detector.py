@@ -79,7 +79,8 @@ class TestDetectors:
         )
         test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
         test_detector = constant_threshold(test_metric, detector_config)
-        test_detector.train()
+        data = test_metric.query()
+        test_detector.train(data)
         assert test_detector.config.training_metadata.strategy == constant_threshold_strategy.SIGMA
         assert isclose(test_detector.config.hyperparameters.weak_upper_threshold, 21.196168, rel_tol=0.0001)
         assert isclose(test_detector.config.hyperparameters.strong_upper_threshold, 31.422185, rel_tol=0.0001)
@@ -94,7 +95,8 @@ class TestDetectors:
         )
         test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
         test_detector = constant_threshold(test_metric, detector_config)
-        test_detector.train()
+        data = test_metric.query()
+        test_detector.train(data)
         assert test_detector.config.training_metadata.strategy == constant_threshold_strategy.QUARTILE
         assert test_detector.config.hyperparameters.weak_upper_threshold == 16.25
         assert test_detector.config.hyperparameters.strong_upper_threshold == 24.5
@@ -120,6 +122,7 @@ class TestDetectors:
         )
         test_metric = mock_metric(data=[3])
         test_detector = constant_threshold(test_metric, detector_config)
+        data = test_metric.query()
         with pytest.raises(exceptions.DetectorBuilderError) as exception:
-            test_detector.train()
+            test_detector.train(data)
         assert str(exception.value) == "Sample must have at least two elements"

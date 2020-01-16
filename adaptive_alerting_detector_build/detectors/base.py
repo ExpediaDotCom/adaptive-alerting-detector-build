@@ -34,7 +34,7 @@ class base_detector:
     def builder(self, config):
         return config
 
-    def train(self, *args, **kwargs):
+    def train(self, data, *args, **kwargs):
         raise NotImplementedError
 
     def save(self):
