@@ -2,7 +2,6 @@ import copy
 import json
 import pytest
 import responses
-from requests_mock.contrib import fixture
 
 from adaptive_alerting_detector_build.metrics import metric
 
