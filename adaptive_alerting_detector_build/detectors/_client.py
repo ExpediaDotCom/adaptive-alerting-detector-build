@@ -5,8 +5,8 @@ import time
 
 LOGGER = logging.getLogger(__name__)
 
-class client:
 
+class client:
     def __init__(self, url, **kwargs):
         self._url = url
 
@@ -14,7 +14,9 @@ class client:
         pass
 
     # detectors can't be managed without looking up by a metric, so the only way to create a detector is to lookup the metric first and see that it doesn't exist.  If it exists,
-    def create(self, detector_type, detectorConfig, createdBy, enabled=True, trusted=True):
+    def create(
+        self, detector_type, detectorConfig, createdBy, enabled=True, trusted=True
+    ):
         """
 
         If a detector already exists for metric, DetectorBuilderError is raised
@@ -25,16 +27,14 @@ class client:
             "detectorConfig": detectorConfig,
             "enabled": enabled,
             "lastUpdateTimestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
-            "createdBy": createdBy
+            "createdBy": createdBy,
         }
         response = requests.post(
-            f"%{self._url}/modelservice/api/v2/detectors/",
-            json=data,
+            f"%{self._url}/modelservice/api/v2/detectors/", json=data,
         )
         response.raise_for_status()
         detector_uuid = response.text
         return detector_uuid
-
 
     # # pylint: disable-msg=too-many-arguments
     # def update_detector_thresholds(detector_uuid, upper_weak, upper_strong,
@@ -44,7 +44,6 @@ class client:
     #                                                 upper_strong_multiplier)
     #     detector_config = detector_data.get('detectorConfig')
     #     return detector_config
-
 
     # def get_detector_details(detector_uuid):
     #     response = requests.get(
@@ -59,7 +58,6 @@ class client:
     #     detector_data = response.json()
     #     emit_success_metrics('get_detector_by_uuid')
     #     return detector_data
-
 
     # # pylint: disable-msg=too-many-arguments
     # def update_detector_config_params(detector_uuid,
@@ -92,7 +90,6 @@ class client:
     #         emit_fail_metrics('update_detector_thresholds')
     #     return detector_data
 
-
     # def find_detector_uuid_by_tags(tags):
     #     response = requests.post(
     #         '%s/modelservice/api/detectorMappings/findMatchingByTags'
@@ -113,4 +110,3 @@ class client:
     #         detector_uuid = ids[-1].get('uuid')
     #     LOGGER.info('found detector_uuid=%s for tags=%s', detector_uuid, tags)
     #     return detector_uuid
-            

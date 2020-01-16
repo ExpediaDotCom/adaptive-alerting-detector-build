@@ -15,19 +15,24 @@ import attr
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
+
 class constant_threshold_strategy(Enum):
     """Constant threshold model fitting strategies"""
 
     SIGMA = "sigma"
     QUARTILE = "quartile"
 
+
 @attr.s
 class constant_threshold_training_metadata:
-    strategy = attr.ib(default = constant_threshold_strategy.SIGMA,
+    strategy = attr.ib(
+        default=constant_threshold_strategy.SIGMA,
         validator=attr.validators.in_(constant_threshold_strategy),
-        converter=constant_threshold_strategy)
+        converter=constant_threshold_strategy,
+    )
     weak_multiplier = attr.ib(default=1)
     strong_multiplier = attr.ib(default=1)
+
 
 @attr.s
 class constant_threshold_hyperparametrs:
@@ -36,10 +41,17 @@ class constant_threshold_hyperparametrs:
     weak_lower_threshold = attr.ib()
     strong_lower_threshold = attr.ib()
 
+
 @attr.s
 class constant_threshold_config:
-    training_metadata = attr.ib(validator=attr.validators.instance_of(constant_threshold_training_metadata))
-    hyperparameters = attr.ib(validator=attr.validators.optional(attr.validators.instance_of(constant_threshold_hyperparametrs)))
+    training_metadata = attr.ib(
+        validator=attr.validators.instance_of(constant_threshold_training_metadata)
+    )
+    hyperparameters = attr.ib(
+        validator=attr.validators.optional(
+            attr.validators.instance_of(constant_threshold_hyperparametrs)
+        )
+    )
 
 
 class constant_threshold(base_detector):
@@ -72,8 +84,8 @@ class constant_threshold(base_detector):
             Detector object
         """
         return constant_threshold_config(
-            training_metadata = constant_threshold_training_metadata(**config),
-            hyperparameters = None
+            training_metadata=constant_threshold_training_metadata(**config),
+            hyperparameters=None,
         )
 
     def train(self, data):
@@ -97,20 +109,20 @@ class constant_threshold(base_detector):
             Detector object
         """
 
-
         sigma = _calculate_sigma(sample)
         mean = _calculate_mean(sample)
         weak_upper_threshold, weak_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.training_metadata.weak_multiplier)
+            sigma, mean, self.config.training_metadata.weak_multiplier
+        )
         strong_upper_threshold, strong_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.training_metadata.strong_multiplier)
+            sigma, mean, self.config.training_metadata.strong_multiplier
+        )
 
-        
         hyperparameters = constant_threshold_hyperparametrs(
             weak_upper_threshold,
             strong_upper_threshold,
             weak_lower_threshold,
-            strong_lower_threshold
+            strong_lower_threshold,
         )
         # print('hyperparameters',hyperparameters)
         self.config.hyperparameters = hyperparameters
@@ -129,16 +141,18 @@ class constant_threshold(base_detector):
             Detector object
        """
         q1, median, q3 = _calculate_quartiles(sample)
-        weak_upper_threshold, weak_lower_threshold = \
-                _calculate_quartile_thresholds(q1, q3, self.config.training_metadata.weak_multiplier)
-        strong_upper_threshold, strong_lower_threshold = \
-                _calculate_quartile_thresholds(q1, q3, self.config.training_metadata.strong_multiplier)
+        weak_upper_threshold, weak_lower_threshold = _calculate_quartile_thresholds(
+            q1, q3, self.config.training_metadata.weak_multiplier
+        )
+        strong_upper_threshold, strong_lower_threshold = _calculate_quartile_thresholds(
+            q1, q3, self.config.training_metadata.strong_multiplier
+        )
 
         hyperparameters = constant_threshold_hyperparametrs(
             weak_upper_threshold,
             strong_upper_threshold,
             weak_lower_threshold,
-            strong_lower_threshold
+            strong_lower_threshold,
         )
         # print('hyperparameters',hyperparameters)
         self.config.hyperparameters = hyperparameters
@@ -155,6 +169,7 @@ def _calculate_sigma(sample):
     array = np.array(sample)
     return np.std(array, ddof=1)
 
+
 def _calculate_mean(sample):
     """Calculates and returns the mean of the provided sample.
 
@@ -164,6 +179,7 @@ def _calculate_mean(sample):
 
     array = np.array(sample)
     return np.mean(array)
+
 
 def _calculate_sigma_thresholds(sigma, mean, multiplier):
     """Calculates and returns the thresholds using sigmas.
@@ -181,6 +197,7 @@ def _calculate_sigma_thresholds(sigma, mean, multiplier):
     lower = mean - sigma * multiplier
     return upper, lower
 
+
 def _calculate_quartiles(sample):
     """Calculates and returns quartiles for the provided sample.
 
@@ -195,7 +212,8 @@ def _calculate_quartiles(sample):
     """
 
     array = np.array(sample)
-    return np.percentile(array, [25, 50, 75], interpolation='midpoint')
+    return np.percentile(array, [25, 50, 75], interpolation="midpoint")
+
 
 def _calculate_quartile_thresholds(q1, q3, multiplier):
     """Calculates and returns the thresholds using quartiles.

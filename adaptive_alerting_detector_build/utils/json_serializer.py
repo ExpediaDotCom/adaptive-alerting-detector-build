@@ -8,10 +8,12 @@ from json import JSONEncoder
 
 _saved_default = JSONEncoder().default  # Save default method.
 
+
 def _new_default(self, obj):
     if isinstance(obj, Enum):
         return obj.value  # Could also be obj.value
     else:
         return _saved_default
 
-JSONEncoder.default = _new_default # Set new default method.
+
+JSONEncoder.default = _new_default  # Set new default method.
