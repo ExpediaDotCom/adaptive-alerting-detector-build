@@ -1,8 +1,8 @@
 import requests
 import pandas as pd
-from adaptive_alerting_detector_build.datasources import _datasource, DatasourceQueryException
+from adaptive_alerting_detector_build.datasources import base_datasource, DatasourceQueryException
 
-class graphite(_datasource):
+class graphite(base_datasource):
 
     def __init__(self, url, **kwargs):
         self._url = url
@@ -24,8 +24,7 @@ class graphite(_datasource):
                 'until': end,
                 'format': 'json'
             }
-            
-            response = requests.get(self._render_url, params=params, timeout=30)
+            response = requests.get(self._render_url, params=params, timeout=1)
             response.raise_for_status()
             data = map(lambda d: {"time": d[1], "value": d[0]}, response.json()[0]["datapoints"])
             df = pd.DataFrame(data, columns=["time", "value"])

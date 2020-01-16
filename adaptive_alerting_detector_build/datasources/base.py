@@ -1,7 +1,11 @@
 from adaptive_alerting_detector_build.exceptions import AdaptiveAlertingDetectorBuildError
 
 
-class _datasource:
+class DatasourceQueryException(AdaptiveAlertingDetectorBuildError):
+    """Raised when query fails."""
+
+
+class base_datasource:
     def __init__(self, **kwargs):
         pass
 
@@ -9,5 +13,4 @@ class _datasource:
         raise NotImplementedError
 
 
-class DatasourceQueryException(AdaptiveAlertingDetectorBuildError):
-    """Raised when query fails."""
+
