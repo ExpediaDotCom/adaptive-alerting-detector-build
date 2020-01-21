@@ -9,9 +9,7 @@ def build_profile(x):
     :return: time series feature profile
     """
 
-    return {
-        "stationary": _is_stationary(x, "1%")
-    }
+    return {"stationary": _is_stationary(x, "1%")}
 
 
 def _is_stationary(x, significance):
@@ -26,5 +24,9 @@ def _is_stationary(x, significance):
     test_stat = result[0]
     p_value = result[1]
     crit_value = result[4][significance]
-    print("\ncrit_value_{}={}, test_stat={}, p_value={}".format(crit_value, test_stat, significance, p_value))
+    print(
+        "\ncrit_value_{}={}, test_stat={}, p_value={}".format(
+            crit_value, test_stat, significance, p_value
+        )
+    )
     return test_stat < crit_value
