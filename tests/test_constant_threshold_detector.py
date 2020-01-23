@@ -9,7 +9,6 @@ from adaptive_alerting_detector_build.detectors.constant_threshold import (
 )
 from adaptive_alerting_detector_build.detectors import exceptions
 from adaptive_alerting_detector_build.metrics import metric
-from .fixtures import mock_metric
 import responses
 import json
 
@@ -73,7 +72,7 @@ class TestDetectors:
     #     assert upper == 9.5 # (q3 + (q3 - q1) * 1.5)
     #     assert lower == -2.5 # (q1 - (q3 - q1) * 1.5)
 
-    def test_create_detector_with_sigma_strategy(self):
+    def test_create_detector_with_sigma_strategy(self, mock_metric):
         detector_config = dict(
             training_metadata=dict(
                 strategy="sigma", weak_multiplier=3.0, strong_multiplier=5.0
@@ -111,10 +110,12 @@ class TestDetectors:
 
     def test_create_detector_with_quartile_strategy(self, mock_metric):
         detector_config = dict(
-            strategy="quartile", weak_multiplier=1.5, strong_multiplier=3.0
+            training_metadata=dict(
+                strategy="quartile", weak_multiplier=1.5, strong_multiplier=3.0
+            )
         )
         test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
-        test_detector = ConstantThresholdDetector(test_metric, detector_config)
+        test_detector = create_detector("constant_threshold", detector_config)
         data = test_metric.query()
         test_detector.train(data)
         assert (

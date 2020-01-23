@@ -12,6 +12,8 @@ statsmodels = "*"
 seaborn = "*"
 cattrs = "*"
 marshmallow = "*"
+marshmallow-enum = "*"
+related = "*"
 
 [dev-packages]
 pytest = "*"
