@@ -3,11 +3,13 @@
 from math import isclose
 from re import search
 import pytest
-from adaptive_alerting_detector_build.detectors import _constant_threshold as ct
-from adaptive_alerting_detector_build.detectors import constant_threshold, constant_threshold_strategy
+from adaptive_alerting_detector_build.detectors import create_detector
+from adaptive_alerting_detector_build.detectors.constant_threshold import (
+    ConstantThresholdStrategy,
+)
 from adaptive_alerting_detector_build.detectors import exceptions
 from adaptive_alerting_detector_build.metrics import metric
-from .fixtures import test_metric, mock_metric
+from .fixtures import mock_metric
 import responses
 import json
 
@@ -71,58 +73,80 @@ class TestDetectors:
     #     assert upper == 9.5 # (q3 + (q3 - q1) * 1.5)
     #     assert lower == -2.5 # (q1 - (q3 - q1) * 1.5)
 
-    def test_create_detector_with_sigma_strategy(self, mock_metric):
+    def test_create_detector_with_sigma_strategy(self):
         detector_config = dict(
-            strategy = "sigma",
-            weak_multiplier = 3.0,
-            strong_multiplier = 5.0
+            training_metadata=dict(
+                strategy="sigma", weak_multiplier=3.0, strong_multiplier=5.0
+            )
         )
         test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
-        test_detector = constant_threshold(test_metric, detector_config)
+        test_detector = create_detector("constant_threshold", detector_config)
         data = test_metric.query()
         test_detector.train(data)
-        assert test_detector.config.training_metadata.strategy == constant_threshold_strategy.SIGMA
-        assert isclose(test_detector.config.hyperparameters.weak_upper_threshold, 21.196168, rel_tol=0.0001)
-        assert isclose(test_detector.config.hyperparameters.strong_upper_threshold, 31.422185, rel_tol=0.0001)
-        assert isclose(test_detector.config.hyperparameters.weak_lower_threshold, -9.481883, rel_tol=0.0001)
-        assert isclose(test_detector.config.hyperparameters.strong_lower_threshold, -19.70790, rel_tol=0.0001)
+        print("test_detector.config.training_metadata.strategy", test_detector.config.training_metadata.strategy)
+        assert (
+            test_detector.config.training_metadata.strategy
+            == ConstantThresholdStrategy.SIGMA
+        )
+        assert isclose(
+            test_detector.config.hyperparameters.weak_upper_threshold,
+            21.196168,
+            rel_tol=0.0001,
+        )
+        assert isclose(
+            test_detector.config.hyperparameters.strong_upper_threshold,
+            31.422185,
+            rel_tol=0.0001,
+        )
+        assert isclose(
+            test_detector.config.hyperparameters.weak_lower_threshold,
+            -9.481883,
+            rel_tol=0.0001,
+        )
+        assert isclose(
+            test_detector.config.hyperparameters.strong_lower_threshold,
+            -19.70790,
+            rel_tol=0.0001,
+        )
 
     def test_create_detector_with_quartile_strategy(self, mock_metric):
         detector_config = dict(
-            strategy = "quartile",
-            weak_multiplier = 1.5,
-            strong_multiplier = 3.0
+            strategy="quartile", weak_multiplier=1.5, strong_multiplier=3.0
         )
         test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
-        test_detector = constant_threshold(test_metric, detector_config)
+        test_detector = ConstantThresholdDetector(test_metric, detector_config)
         data = test_metric.query()
         test_detector.train(data)
-        assert test_detector.config.training_metadata.strategy == constant_threshold_strategy.QUARTILE
+        assert (
+            test_detector.config.training_metadata.strategy
+            == ConstantThresholdStrategy.QUARTILE
+        )
         assert test_detector.config.hyperparameters.weak_upper_threshold == 16.25
         assert test_detector.config.hyperparameters.strong_upper_threshold == 24.5
         assert test_detector.config.hyperparameters.weak_lower_threshold == -5.75
         assert test_detector.config.hyperparameters.strong_lower_threshold == -14
 
-    def test_create_detector_with_invalid_strategy_raises_build_error(self, mock_metric):
-        detector_config = dict(
-            strategy = "invalid strategy",
-            weak_multiplier = 3,
-            strong_multiplier = 5
-        )
-        test_metric = mock_metric()
-        with pytest.raises(ValueError) as exception:
-            test_detector = constant_threshold(test_metric, detector_config)
-        assert str(exception.value) == "'invalid strategy' is not a valid constant_threshold_strategy"
+    # def test_create_detector_with_invalid_strategy_raises_build_error(
+    #     self, mock_metric
+    # ):
+    #     detector_config = dict(
+    #         strategy="invalid strategy", weak_multiplier=3, strong_multiplier=5
+    #     )
+    #     test_metric = mock_metric()
+    #     with pytest.raises(ValueError) as exception:
+    #         test_detector = ConstantThresholdDetector(test_metric, detector_config)
+    #     assert (
+    #         str(exception.value)
+    #         == "'invalid strategy' is not a valid constant_threshold_strategy"
+    #     )
 
-    def test_train_detector_with_invalid_sample_size_raises_build_error(self, mock_metric):
-        detector_config = dict(
-            strategy = "sigma",
-            weak_multiplier = 3,
-            strong_multiplier = 5
-        )
-        test_metric = mock_metric(data=[3])
-        test_detector = constant_threshold(test_metric, detector_config)
-        data = test_metric.query()
-        with pytest.raises(exceptions.DetectorBuilderError) as exception:
-            test_detector.train(data)
-        assert str(exception.value) == "Sample must have at least two elements"
+    # def test_train_detector_with_invalid_sample_size_raises_build_error(
+    #     self, mock_metric
+    # ):
+    #     detector_config = dict(strategy="sigma", weak_multiplier=3, strong_multiplier=5)
+    #     test_metric = mock_metric(data=[3])
+    #     test_detector = ConstantThresholdDetector(test_metric, detector_config)
+    #     data = test_metric.query()
+    #     with pytest.raises(exceptions.DetectorBuilderError) as exception:
+    #         test_detector.train(data)
+    #     assert str(exception.value) == "Sample must have at least two elements"

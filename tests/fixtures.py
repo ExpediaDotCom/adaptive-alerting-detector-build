@@ -3,26 +3,23 @@ import json
 import pytest
 import responses
 
-from adaptive_alerting_detector_build.metrics import metric
+from adaptive_alerting_detector_build.metrics import Metric
 
-GRAPHITE_MOCK_RESPONSE = json.loads(open('tests/data/graphite_mock.json').read())
+GRAPHITE_MOCK_RESPONSE = json.loads(open("tests/data/graphite_mock.json").read())
 
 
-@pytest.fixture
-@responses.activate
-def test_metric():
-    responses.add(responses.GET, "http://graphite/render?target=sumSeries(seriesByTag('role=my-app-web','what=elb_2xx'))&from=-168hours&until=now&format=json",
-                json=GRAPHITE_MOCK_RESPONSE,
-                status=200)
-    metric_config = { 
-        "tags": {
-            "role": "my-app-web", 
-            "what": "elb_2xx"
-    }}
-    datasource_config = {
-        "url": "http://graphite"
-    }
-    return metric(metric_config, datasource_config, model_service_url="http://modelservice")
+# @pytest.fixture
+# @responses.activate
+# def test_metric():
+#     responses.add(
+#         responses.GET,
+#         "http://graphite/render?target=sumSeries(seriesByTag('role=my-app-web','what=elb_2xx'))&from=-168hours&until=now&format=json",
+#         json=GRAPHITE_MOCK_RESPONSE,
+#         status=200,
+#     )
+#     metric_config = {"tags": {"role": "my-app-web", "what": "elb_2xx"}}
+#     datasource_config = {"url": "http://graphite"}
+#     return Metric(metric_config, datasource_config)
 
 
 # @pytest.fixture
@@ -43,18 +40,18 @@ def test_metric():
 #     resp = requests.get('http://twitter.com/api/1/foobar')
 #     assert resp.status_code == 200
 
-@pytest.fixture
-def mock_metric():
-    metric_config = { 
-        "tags": {
-            "role": "my-app-web", 
-            "what": "elb_2xx"
-    }}
-    def create_mock_metric(data=None, metric_config=metric_config):
-        datasource_config = {
-            "type": "mock"
-        }
-        if data:
-            datasource_config["data"] = data
-        return metric(metric_config, datasource_config, model_service_url="http://modelservice")
-    return create_mock_metric
+
+# @pytest.fixture
+# def mock_metric():
+
+
+#     return create_mock_metric
+
+MOCK_METRIC_CONFIG = {"tags": {"role": "my-app-web", "what": "elb_2xx"}}
+
+
+def mock_metric(data=None, metric_config=MOCK_METRIC_CONFIG):
+    datasource_config = {"type": "mock"}
+    if data:
+        datasource_config["data"] = data
+    return Metric(metric_config, datasource_config, "http://modelservice")

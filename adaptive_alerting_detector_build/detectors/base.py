@@ -1,41 +1,22 @@
 import attr
-import json
-import copy
+import uuid
 
-from adaptive_alerting_detector_build.utils import json_serializer
-# from adaptive_alerting_detector_build.metrics import metric
+from adaptive_alerting_detector_build.utils.attrs import validate
 
-class base_detector:
-    """Base class for detectors."""
-    metric = None
 
-    def __init__(self, metric, config):
-        self.metric = metric
-        # self.__config = {}
-        self.config = self.builder(config)
+@attr.s
+class DetectorBase:
+    detector_type = attr.ib(validator=validate(str))
+    config = attr.ib()
+    enabled = attr.ib(default=True, validator=validate(bool))
+    trusted = attr.ib(default=False, validator=validate(bool))
+    last_updated = attr.ib(default=None, validator=validate(str, optional=True))
+    detector_uuid = attr.ib(default=None, validator=validate(str, optional=True))
 
-    # @property
-    # def config(self):
-    #     __config = {}
-    #     for key, value in self.config.items():
-    #         if attr.has(value):
-    #             __config[key] = attr.asdict(value)
-    #         else:
-    #             __config[key] = value
-    #     return __config
-        
-    # @config.setter
-    # def config(self, config):
-    #     self.__config = self.builder(copy.deepcopy(self.__config).update(config))
-    
-    def json(self):
-        return json.dumps(self.config)
+    # @classmethod
+    # def get_instance(cls, string):
+    #     return next(c for c in cls.__subclasses__() if c.__name__.lower() == string)()
 
-    def builder(self, config):
-        return config
-
-    def train(self, data, *args, **kwargs):
+    def train_detector(self, data, *args, **kwargs):
         raise NotImplementedError
-
-    def save(self):
-        pass
+ 

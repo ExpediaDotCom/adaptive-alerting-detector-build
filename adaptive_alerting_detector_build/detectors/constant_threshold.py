@@ -5,44 +5,58 @@ This module provides functions to build constant threshold detectors that fit th
 data.
 """
 
-from enum import Enum
+import attr
+from typing import Optional
+from enum import unique, Enum
 import logging
 import numpy as np
-from adaptive_alerting_detector_build.detectors import base_detector
-from adaptive_alerting_detector_build.detectors import exceptions
-import attr
+
+# from adaptive_alerting_detector_build.detectors import exceptions
+from .base import DetectorBase
+from .exceptions import DetectorBuilderError
+from adaptive_alerting_detector_build.utils.attrs import validate
+
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
-class constant_threshold_strategy(Enum):
-    """Constant threshold model fitting strategies"""
 
+@unique
+class ConstantThresholdStrategy(Enum):
+    """Constant threshold model fitting strategies"""
     SIGMA = "sigma"
     QUARTILE = "quartile"
 
-@attr.s
-class constant_threshold_training_metadata:
-    strategy = attr.ib(default = constant_threshold_strategy.SIGMA,
-        validator=attr.validators.in_(constant_threshold_strategy),
-        converter=constant_threshold_strategy)
-    weak_multiplier = attr.ib(default=1)
-    strong_multiplier = attr.ib(default=1)
 
 @attr.s
-class constant_threshold_hyperparametrs:
-    weak_upper_threshold = attr.ib()
-    strong_upper_threshold = attr.ib()
-    weak_lower_threshold = attr.ib()
-    strong_lower_threshold = attr.ib()
+class ConstantThresholdTrainingMetadata:
+    strategy: ConstantThresholdStrategy = attr.ib(
+        default=ConstantThresholdStrategy.SIGMA
+    )
+    weak_multiplier: float = attr.ib(default=1)
+    strong_multiplier: float = attr.ib(default=1)
+
 
 @attr.s
-class constant_threshold_config:
-    training_metadata = attr.ib(validator=attr.validators.instance_of(constant_threshold_training_metadata))
-    hyperparameters = attr.ib(validator=attr.validators.optional(attr.validators.instance_of(constant_threshold_hyperparametrs)))
+class ConstantThresholdHyperparametrs:
+    weak_upper_threshold: float = attr.ib()
+    strong_upper_threshold: float = attr.ib()
+    weak_lower_threshold: float = attr.ib()
+    strong_lower_threshold: float = attr.ib()
 
 
-class constant_threshold(base_detector):
+class ConstantThresholdConfig:
+
+    def __init__(self, training_metadata, hyperparameters=None, **_ignored_parameters):
+        self.training_metadata = ConstantThresholdTrainingMetadata(training_metadata)
+        if hyperparameters:
+            self.hyperparameters = ConstantThresholdHyperparametrs(hyperparameters)
+        else:
+            self.hyperparameters = {}
+
+
+@attr.s
+class ConstantThresholdDetector(DetectorBase):
     """Constant Threshold Detectors Builder class.
 
     This class provides methods to return a Detector object that fits provided metrics data, using
@@ -52,35 +66,37 @@ class constant_threshold(base_detector):
         - sigma
         - quartile
     """
+    # config = attr.ib(validator=attr.validators.instance_of(ConstantThresholdConfig))
+    id = "constant_threshold"
+    config_class = ConstantThresholdConfig
+    
+    # """
 
-    def builder(self, config):
-        """Performs calculations and returns a detector object.
+    # Calculations are performed on the provided data using the specified strategy, to determine
+    # weak and strong thresholds.
 
-        Calculations are performed on the provided data using the specified strategy, to determine
-        weak and strong thresholds.
+    # Parameters:
+    #     strategy: the strategy to use to determine thresholds; must be one from the Strategy
+    #               class
+    #     sample: list of number data on which calculations are performed
+    #     weak_multiplier: number that represents to multiplier to use to calculate weak
+    #                      thresholds
+    #     strong_multiplier: number that represents to multiplier to use to calculate strong
+    #                        thresholds
 
-        Parameters:
-            strategy: the strategy to use to determine thresholds; must be one from the Strategy
-                      class
-            sample: list of number data on which calculations are performed
-            weak_multiplier: number that represents to multiplier to use to calculate weak
-                             thresholds
-            strong_multiplier: number that represents to multiplier to use to calculate strong
-                               thresholds
+    # Returns:
+    #     Detector object
+    # """
+    # return constant_threshold_config(**detector_config)
 
-        Returns:
-            Detector object
-        """
-        return constant_threshold_config(
-            training_metadata = constant_threshold_training_metadata(**config),
-            hyperparameters = None
-        )
 
     def train(self, data):
+        """
+        """
         strategy = self.config.training_metadata.strategy
-        if strategy == constant_threshold_strategy.SIGMA:
+        if strategy == ConstantThresholdStrategy.SIGMA:
             self._train_sigma(data)
-        elif strategy == constant_threshold_strategy.QUARTILE:
+        elif strategy == ConstantThresholdStrategy.QUARTILE:
             self._train_quartile(data)
 
     def _train_sigma(self, sample):
@@ -97,23 +113,20 @@ class constant_threshold(base_detector):
             Detector object
         """
 
-
         sigma = _calculate_sigma(sample)
         mean = _calculate_mean(sample)
         weak_upper_threshold, weak_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.training_metadata.weak_multiplier)
+            sigma, mean, self.config.training_metadata.weak_multiplier
+        )
         strong_upper_threshold, strong_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.training_metadata.strong_multiplier)
-
-        
-        hyperparameters = constant_threshold_hyperparametrs(
+            sigma, mean, self.config.training_metadata.strong_multiplier
+        )
+        self.config.hyperparameters = ConstantThresholdHyperparametrs(
             weak_upper_threshold,
             strong_upper_threshold,
             weak_lower_threshold,
-            strong_lower_threshold
+            strong_lower_threshold,
         )
-        # print('hyperparameters',hyperparameters)
-        self.config.hyperparameters = hyperparameters
 
     def _train_quartile(self, sample):
         """Performs threshold calculations using quartile strategy.
@@ -129,19 +142,19 @@ class constant_threshold(base_detector):
             Detector object
        """
         q1, median, q3 = _calculate_quartiles(sample)
-        weak_upper_threshold, weak_lower_threshold = \
-                _calculate_quartile_thresholds(q1, q3, self.config.training_metadata.weak_multiplier)
-        strong_upper_threshold, strong_lower_threshold = \
-                _calculate_quartile_thresholds(q1, q3, self.config.training_metadata.strong_multiplier)
+        weak_upper_threshold, weak_lower_threshold = _calculate_quartile_thresholds(
+            q1, q3, self.config.training_metadata.weak_multiplier
+        )
+        strong_upper_threshold, strong_lower_threshold = _calculate_quartile_thresholds(
+            q1, q3, self.config.training_metadata.strong_multiplier
+        )
 
-        hyperparameters = constant_threshold_hyperparametrs(
+        self.config.hyperparameters = ConstantThresholdHyperparametrs(
             weak_upper_threshold,
             strong_upper_threshold,
             weak_lower_threshold,
-            strong_lower_threshold
+            strong_lower_threshold,
         )
-        # print('hyperparameters',hyperparameters)
-        self.config.hyperparameters = hyperparameters
 
 
 def _calculate_sigma(sample):
@@ -151,9 +164,10 @@ def _calculate_sigma(sample):
         sample: list of number data on which calculations are performed
     """
     if len(sample) < 2:
-        raise exceptions.DetectorBuilderError("Sample must have at least two elements")
+        raise DetectorBuilderError("Sample must have at least two elements")
     array = np.array(sample)
     return np.std(array, ddof=1)
+
 
 def _calculate_mean(sample):
     """Calculates and returns the mean of the provided sample.
@@ -164,6 +178,7 @@ def _calculate_mean(sample):
 
     array = np.array(sample)
     return np.mean(array)
+
 
 def _calculate_sigma_thresholds(sigma, mean, multiplier):
     """Calculates and returns the thresholds using sigmas.
@@ -181,6 +196,7 @@ def _calculate_sigma_thresholds(sigma, mean, multiplier):
     lower = mean - sigma * multiplier
     return upper, lower
 
+
 def _calculate_quartiles(sample):
     """Calculates and returns quartiles for the provided sample.
 
@@ -195,7 +211,8 @@ def _calculate_quartiles(sample):
     """
 
     array = np.array(sample)
-    return np.percentile(array, [25, 50, 75], interpolation='midpoint')
+    return np.percentile(array, [25, 50, 75], interpolation="midpoint")
+
 
 def _calculate_quartile_thresholds(q1, q3, multiplier):
     """Calculates and returns the thresholds using quartiles.
