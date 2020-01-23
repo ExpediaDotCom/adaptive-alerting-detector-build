@@ -4,13 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-dataclasses = {version = ">=0.6",python_version = "< 3.7"}
-attrs = "*"
 matplotlib = "*"
 numpy = "*"
 pandas = "*"
 statsmodels = "*"
 seaborn = "*"
+related = "*"
 
 [dev-packages]
 pytest = "*"

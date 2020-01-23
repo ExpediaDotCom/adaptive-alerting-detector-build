@@ -1,44 +1,13 @@
-import attr
-import json
-import copy
+import related
 
-from adaptive_alerting_detector_build.utils import json_serializer
+@related.mutable
+class DetectorBase:
+    detector_type = related.StringField()
+    config = related.ChildField(object)
+    enabled = related.BooleanField(default=True)
+    trusted = related.BooleanField(default=False)
+    last_updated = related.DateTimeField("%Y-%m-%d %H:%M:%S", required=False)
+    detector_uuid = related.StringField(required=False)
 
-# from adaptive_alerting_detector_build.metrics import metric
-
-
-class base_detector:
-    """Base class for detectors."""
-
-    metric = None
-
-    def __init__(self, metric, config):
-        self.metric = metric
-        # self.__config = {}
-        self.config = self.builder(config)
-
-    # @property
-    # def config(self):
-    #     __config = {}
-    #     for key, value in self.config.items():
-    #         if attr.has(value):
-    #             __config[key] = attr.asdict(value)
-    #         else:
-    #             __config[key] = value
-    #     return __config
-
-    # @config.setter
-    # def config(self, config):
-    #     self.__config = self.builder(copy.deepcopy(self.__config).update(config))
-
-    def json(self):
-        return json.dumps(self.config)
-
-    def builder(self, config):
-        return config
-
-    def train(self, data, *args, **kwargs):
+    def train_detector(self, data, *args, **kwargs):
         raise NotImplementedError
-
-    def save(self):
-        pass

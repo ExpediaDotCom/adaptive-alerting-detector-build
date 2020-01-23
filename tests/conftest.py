@@ -3,7 +3,7 @@ import json
 import pytest
 import responses
 
-from adaptive_alerting_detector_build.metrics import metric
+from adaptive_alerting_detector_build.metrics import Metric
 
 GRAPHITE_MOCK_RESPONSE = json.loads(open('tests/data/graphite_mock.json').read())
 
@@ -22,7 +22,7 @@ def test_metric():
     datasource_config = {
         "url": "http://graphite"
     }
-    return metric(metric_config, datasource_config, model_service_url="http://modelservice")
+    return Metric(metric_config, datasource_config, model_service_url="http://modelservice")
 
 
 # @pytest.fixture
@@ -56,5 +56,5 @@ def mock_metric():
         }
         if data:
             datasource_config["data"] = data
-        return metric(metric_config, datasource_config, model_service_url="http://modelservice")
+        return Metric(metric_config, datasource_config, model_service_url="http://modelservice")
     return create_mock_metric

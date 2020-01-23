@@ -1,4 +1,4 @@
-from adaptive_alerting_detector_build.metrics import metric
+from adaptive_alerting_detector_build.metrics import Metric
 import pandas as pd
 import responses
 import json
@@ -21,8 +21,8 @@ def test_new_trusted_metric_detector():
     datasource_config = {
         "url": "http://graphite"
     }
-    test_metric = metric(metric_config, datasource_config, model_service_url="http://modelservice")
-    assert isinstance(test_metric, metric)
+    test_metric = Metric(metric_config, datasource_config, model_service_url="http://modelservice")
+    assert isinstance(test_metric, Metric)
     # detector_config={}
     # test_metric_detector = test_metric_detector(test_metric, detector_config)
     # test_metric_detector.train()

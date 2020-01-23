@@ -1,1 +1,1 @@
-from ._metric import metric
+from .metric import Metric

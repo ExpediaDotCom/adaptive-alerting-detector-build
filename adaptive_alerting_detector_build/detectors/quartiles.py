@@ -1,1 +1,0 @@
-from adaptive_alerting_detector_build.detectors import _detector
