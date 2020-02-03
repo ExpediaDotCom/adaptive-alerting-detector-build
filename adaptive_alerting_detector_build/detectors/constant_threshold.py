@@ -27,24 +27,37 @@ class ConstantThresholdStrategy(Enum):
     SIGMA = "sigma"
     QUARTILE = "quartile"
 
+@unique
+class ConstantThresholdType(Enum):
+    """Constant threshold model type"""
+    RIGHT = "RIGHT_TAILED" 
+    LEFT = "LEFT_TAILED" 
+    TWO = "TWO_TAILED"
+
 
 @related.mutable
-class ConstantThresholdTrainingMetadata:
+class ConstantThresholdHyperparameters:
     strategy = related.ChildField(ConstantThresholdStrategy)
     weak_multiplier = related.FloatField(default=1.0)
     strong_multiplier = related.FloatField(default=1.0)
 
 @related.mutable
-class ConstantThresholdHyperparameters:
-    weak_upper_threshold = related.FloatField()
-    strong_upper_threshold = related.FloatField()
-    weak_lower_threshold = related.FloatField()
-    strong_lower_threshold = related.FloatField()
+class ConstantThresholdThresholds:
+    weak_upper_threshold = related.FloatField(key='upperWeak') 
+    strong_upper_threshold = related.FloatField(key='upperStrong')
+    weak_lower_threshold = related.FloatField(key='lowerWeak')
+    strong_lower_threshold = related.FloatField(key='lowerStrong')
+
+
+@related.mutable
+class ConstantThresholdParams:
+    type = related.ChildField(ConstantThresholdType)
+    thresholds = related.ChildField(ConstantThresholdThresholds)
 
 @related.mutable
 class ConstantThresholdConfig:
-    training_metadata = related.ChildField(ConstantThresholdTrainingMetadata)
-    hyperparameters = related.ChildField(ConstantThresholdHyperparameters, required=False)
+    hyperparameters = related.ChildField(ConstantThresholdHyperparameters)
+    params = related.ChildField(ConstantThresholdParams, required=False)
 
 
 class ConstantThresholdDetector(DetectorBase):
@@ -58,9 +71,10 @@ class ConstantThresholdDetector(DetectorBase):
         - quartile
     """
     # config = attr.ib(validator=attr.validators.instance_of(ConstantThresholdConfig))
-    id = "constant_threshold"
+    id = "constant-detector"
     config_class = ConstantThresholdConfig
     
+
     # """
 
     # Calculations are performed on the provided data using the specified strategy, to determine
@@ -84,7 +98,7 @@ class ConstantThresholdDetector(DetectorBase):
     def train(self, data):
         """
         """
-        strategy = self.config.training_metadata.strategy
+        strategy = self.config.hyperparameters.strategy
         if strategy == ConstantThresholdStrategy.SIGMA:
             self._train_sigma(data)
         elif strategy == ConstantThresholdStrategy.QUARTILE:
@@ -107,18 +121,22 @@ class ConstantThresholdDetector(DetectorBase):
         sigma = _calculate_sigma(sample)
         mean = _calculate_mean(sample)
         weak_upper_threshold, weak_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.training_metadata.weak_multiplier
+            sigma, mean, self.config.hyperparameters.weak_multiplier
         )
         strong_upper_threshold, strong_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.training_metadata.strong_multiplier
+            sigma, mean, self.config.hyperparameters.strong_multiplier
+        )
+
+        self.config.params = ConstantThresholdParams(
+            type = ConstantThresholdType.TWO, #TODO: Default to TWO for now. To be determined by Profiler.
+            thresholds = ConstantThresholdThresholds(
+                            weak_upper_threshold=weak_upper_threshold,
+                            strong_upper_threshold=strong_upper_threshold,
+                            weak_lower_threshold=weak_lower_threshold,
+                            strong_lower_threshold=strong_lower_threshold
+            )
         )
         
-        self.config.hyperparameters = ConstantThresholdHyperparameters(
-                weak_upper_threshold=weak_upper_threshold,
-                strong_upper_threshold=strong_upper_threshold,
-                weak_lower_threshold=weak_lower_threshold,
-                strong_lower_threshold=strong_lower_threshold
-        )
 
     def _train_quartile(self, sample):
         """Performs threshold calculations using quartile strategy.
@@ -135,17 +153,22 @@ class ConstantThresholdDetector(DetectorBase):
        """
         q1, median, q3 = _calculate_quartiles(sample)
         weak_upper_threshold, weak_lower_threshold = _calculate_quartile_thresholds(
-            q1, q3, self.config.training_metadata.weak_multiplier
+            q1, q3, self.config.hyperparameters.weak_multiplier
         )
         strong_upper_threshold, strong_lower_threshold = _calculate_quartile_thresholds(
-            q1, q3, self.config.training_metadata.strong_multiplier
+            q1, q3, self.config.hyperparameters.strong_multiplier
         )
-        self.config.hyperparameters = ConstantThresholdHyperparameters(
-                weak_upper_threshold=weak_upper_threshold,
-                strong_upper_threshold=strong_upper_threshold,
-                weak_lower_threshold=weak_lower_threshold,
-                strong_lower_threshold=strong_lower_threshold
+
+        self.config.params = ConstantThresholdParams(
+            type = ConstantThresholdType.TWO, 
+            thresholds = ConstantThresholdThresholds(
+                            weak_upper_threshold=weak_upper_threshold,
+                            strong_upper_threshold=strong_upper_threshold,
+                            weak_lower_threshold=weak_lower_threshold,
+                            strong_lower_threshold=strong_lower_threshold
+            )
         )
+        
 
 
 
