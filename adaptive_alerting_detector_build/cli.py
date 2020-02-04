@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-
 """Adaptive Alerting Detectors CLI Tool
 
 Creates, re-trains or deletes Adaptive Alerting Constant Threshold detectors, based on the provided
 JSON metrics configuration file.
 
 Usage:
-    adaptive-alerting.py build --datasource=url --aaservice=url --username=name [--weakmultiplier=number] [--strongmultiplier=number] <json_config>...
-    adaptive-alerting.py delete --aaservice=url <json_config>...
-    adaptive-alerting.py -h | --help
+    adaptive-alerting build --datasource=url --aaservice=url --username=name [--weakmultiplier=number] [--strongmultiplier=number] <json_config>...
+    adaptive-alerting delete --aaservice=url <json_config>...
+    adaptive-alerting -h | --help
 
 Commands:
     build       builds new detectors or re-trains existing detectors for the metric
@@ -24,11 +22,11 @@ Options:
     -h --help               Show this screen
 
 Examples:
-    adaptive-alerting.py build --datasource=https://graphite.company.com --aaservice=https://adaptive-alerting.company.com/modelservice --username=msmith service-name.json
+    adaptive-alerting build --datasource=https://graphite.company.com --aaservice=https://adaptive-alerting.company.com/modelservice --username=msmith service-name.json
 
-    adaptive-alerting.py build --datasource=https://graphite.company.com --aaservice=https://adaptive-alerting.company.com/modelservice --username=msmith service-name1.json service-name2.json
+    adaptive-alerting build --datasource=https://graphite.company.com --aaservice=https://adaptive-alerting.company.com/modelservice --username=msmith service-name1.json service-name2.json
 
-    adaptive-alerting.py delete --aaservice=https://adaptive-alerting.company.com service-name.json
+    adaptive-alerting delete --aaservice=https://adaptive-alerting.company.com service-name.json
 
 """
 
@@ -228,6 +226,3 @@ def main():
     sys.exit(EXITCODE)
 
 
-if __name__ == "__main__":
-
-    main()

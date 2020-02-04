@@ -6,6 +6,25 @@ Adaptive Alerting Detector Build Python Library
 pip install git+https://github.com/ExpediaDotCom/adaptive-alerting-detector-build.git#egg=adaptive-alerting-detector-build
 ```
 
+# User Environment
+## Setup
+### Install `pipenv`
+
+ ```$ brew install pipenv```
+
+### Create virtual environment
+
+```$ pipenv install```
+
+## Install tools
+
+```$ pipenv run setup.py```
+
+## Use
+### Use CLI tool
+
+```$ adaptive-alerting -h```
+
 # Development Environment
 ## Setup
 ### Install `pipenv`
