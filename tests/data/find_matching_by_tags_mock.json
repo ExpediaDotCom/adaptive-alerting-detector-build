@@ -1,0 +1,9 @@
+{
+  "groupedDetectorsBySearchIndex": {
+    "0": [
+      { "uuid": "4fdc3395-e969-449a-a306-201db183c6d7" },
+      { "uuid": "47a0661d-aceb-4ef2-bf06-0828f28631b4" }
+    ]
+  },
+  "lookupTimeInMillis": 2
+}

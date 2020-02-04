@@ -12,7 +12,7 @@ import logging
 import numpy as np
 
 # from adaptive_alerting_detector_build.detectors import exceptions
-from . import DetectorBase
+from . import Detector
 from .exceptions import DetectorBuilderError
 from adaptive_alerting_detector_build.utils.attrs import validate
 
@@ -43,11 +43,11 @@ class ConstantThresholdHyperparameters:
 
 @related.mutable
 class ConstantThresholdConfig:
-    training_metadata = related.ChildField(ConstantThresholdTrainingMetadata)
+    training_metadata = related.ChildField(ConstantThresholdTrainingMetadata, required=False)
     hyperparameters = related.ChildField(ConstantThresholdHyperparameters, required=False)
 
 
-class ConstantThresholdDetector(DetectorBase):
+class ConstantThresholdDetector(Detector):
     """Constant Threshold Detectors Builder class.
 
     This class provides methods to return a Detector object that fits provided metrics data, using
@@ -58,7 +58,7 @@ class ConstantThresholdDetector(DetectorBase):
         - quartile
     """
     # config = attr.ib(validator=attr.validators.instance_of(ConstantThresholdConfig))
-    id = "constant_threshold"
+    id = "constant-detector"
     config_class = ConstantThresholdConfig
     
     # """

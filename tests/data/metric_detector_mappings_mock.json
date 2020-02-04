@@ -1,0 +1,33 @@
+[
+  {
+    "id": "DtWuMGsBjgsPmcQlKdOx",
+    "detector": {
+      "uuid": "debea60c-8494-4864-8daf-00bdd540d368"
+    },
+    "expression": {
+      "operator": "AND",
+      "operands": [
+        {
+          "field": {
+            "key": "role",
+            "value": "my-app-web"
+          },
+          "expression": null
+        },
+        {
+          "field": {
+            "key": "what",
+            "value": "elb_2xx"
+          },
+          "expression": null
+        }
+      ]
+    },
+    "user": {
+      "id": "a_username"
+    },
+    "lastModifiedTimeInMillis": 1559889848752,
+    "createdTimeInMillis": 1559889848752,
+    "searchIndexes": null,
+    "enabled": true
+  }]
