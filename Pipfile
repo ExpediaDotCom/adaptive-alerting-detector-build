@@ -19,6 +19,8 @@ pipenv-setup = "*"
 pytest-cov = "*"
 adaptive-alerting-detector-build = {editable = true,path = "."}
 responses = "*"
+pytest-env = "*"
+pipenv = "*"
 
 [requires]
 python_version = "3.7"
