@@ -10,6 +10,7 @@ pandas = "*"
 statsmodels = "*"
 seaborn = "*"
 related = "*"
+docopt = "*"
 
 [dev-packages]
 pytest = "*"

@@ -30,6 +30,26 @@ metric.detectors
 
 # Get detectors assocated to the metric
 metric.detectors
+```
+
+# User Environment
+## Setup
+### Install `pipenv`
+
+ ```$ brew install pipenv```
+
+### Create virtual environment
+
+```$ pipenv install```
+
+## Install tools
+
+```$ pipenv run setup.py```
+
+## Use
+### Use CLI tool
+
+```$ adaptive-alerting -h```
 
 # Development Environment
 ## Setup
