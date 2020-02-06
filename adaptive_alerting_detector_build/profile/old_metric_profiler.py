@@ -1,6 +1,6 @@
-from profile.stationarity_annotator import annotate_stationarity
-from profile.stationarity_display import print_annotated_stationarity_result
-from profile.stationarity_types import AdfResultWrapper, StationarityResult, AnnotatedStationarityResult
+from .stationarity_annotator import annotate_stationarity
+from .stationarity_display import print_stationarity_report
+from .stationarity_types import AdfResultWrapper, StationarityResult, StationarityReport
 
 
 def old_build_profile(df):
@@ -38,10 +38,8 @@ def old_build_profile(df):
 
         print(f"\ncritvalue[{significance}]={result[4][significance]}, test_stat={result[0]}, p_value={result[1]}")
 
-        annotated_stationarity_result: AnnotatedStationarityResult = annotate_stationarity(stationarity_result,
-                                                                                           max_adf_pvalue=1.0)
-        print("")
-        print_annotated_stationarity_result(annotated_stationarity_result)
+        stationarity_report: StationarityReport = annotate_stationarity(stationarity_result, max_adf_pvalue=0.05)
+        print_stationarity_report(stationarity_report)
 
         return result[0] < result[4][significance]
 

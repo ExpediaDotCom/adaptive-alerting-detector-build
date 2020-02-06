@@ -30,7 +30,7 @@ class StationarityResult:
 
 
 @dataclass
-class AnnotatedStationarityResult:
+class StationarityReport:
     adf_result_wrapper: AdfResultWrapper
     adf_summary: str
     p_value_display: str

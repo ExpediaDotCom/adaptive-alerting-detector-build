@@ -2,8 +2,8 @@ from pandas import DataFrame
 
 from .stationarity_annotator import annotate_stationarity
 from .stationarity_checker import stationarity_check, DEFAULT_SIGNIFICANCE, DEFAULT_MAX_ADF_PVALUE
-from .stationarity_display import print_annotated_stationarity_result
-from .stationarity_types import StationarityResult, AnnotatedStationarityResult
+from .stationarity_display import print_stationarity_report
+from .stationarity_types import StationarityResult, StationarityReport
 
 
 def build_profile(df: DataFrame, significance=DEFAULT_SIGNIFICANCE, max_adf_pvalue=DEFAULT_MAX_ADF_PVALUE,
@@ -51,10 +51,10 @@ def _is_stationary(df: DataFrame, significance: str, max_adf_pvalue: float, freq
                                                                       significance=significance,
                                                                       freq=freq,
                                                                       lags=lags)
-    annotated_stationarity_result: AnnotatedStationarityResult = _build_stationarity_report(stationarity_result,
-                                                                                            significance,
-                                                                                            max_adf_pvalue)
-    print_annotated_stationarity_result(annotated_stationarity_result)
+    stationarity_report: StationarityReport = _build_stationarity_report(stationarity_result,
+                                                                         significance,
+                                                                         max_adf_pvalue)
+    print_stationarity_report(stationarity_report)
     return stationarity_result.is_stationary
 
 
@@ -71,7 +71,7 @@ def _build_stationarity_report(stationarity_result, significance, max_adf_pvalue
     p_value = stationarity_result.adf_result.pvalue
     crit_value = stationarity_result.adf_result.critvalues[significance]
     print(f"\ncritvalue[{significance}]={crit_value}, test_stat={test_stat}, p_value={p_value}")
-    annotated_stationarity_result: AnnotatedStationarityResult = annotate_stationarity(stationarity_result,
-                                                                                       significance=significance,
-                                                                                       max_adf_pvalue=max_adf_pvalue)
-    return annotated_stationarity_result
+    stationarity_report: StationarityReport = annotate_stationarity(stationarity_result,
+                                                                    significance=significance,
+                                                                    max_adf_pvalue=max_adf_pvalue)
+    return stationarity_report

@@ -10,13 +10,13 @@ from .df_helper import df_values_as_array
 
 logger = logging.getLogger(__name__)
 
-# TODO: Make this configurable
+DEFAULT_SIGNIFICANCE = "1%"
+DEFAULT_MAX_ADF_PVALUE = 0.05
 
 # There must be at least this number of observations in one day to use our calculated lags,
 #   otherwise stattools.adfuller() will derive its own default
+# TODO: Make this configurable
 AUTO_LAG_THRESHOLD = 24
-DEFAULT_SIGNIFICANCE = "1%"
-DEFAULT_MAX_ADF_PVALUE = 0.05
 
 
 def stationarity_check(df: DataFrame,
