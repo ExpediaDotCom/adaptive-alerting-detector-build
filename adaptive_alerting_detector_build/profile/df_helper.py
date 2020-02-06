@@ -1,13 +1,14 @@
 import datetime
+import logging
 from datetime import timedelta
 
 import pandas as pd
 from pandas import DatetimeIndex, DataFrame, Series
-import logging
-
 from pandas._libs.tslibs.timedeltas import Timedelta
 
+logging.basicConfig()
 LOGGER = logging.getLogger(__name__)
+
 
 # TODO: Move this module to a shared package - i.e. it is not profile-specific
 
@@ -21,7 +22,8 @@ def obs_per_day(df, freq_override=None):
     if freq_override:
         if type(freq_override == str):
             result = calculate_obs_per_day_for_str_freq(freq_override)
-            print(f"Using provided freq_override '{freq_override}'. This means we expect {result} observations per day.")
+            LOGGER.info(f"Using provided freq_override '{freq_override}'. This means we expect {result} observations "
+                         f"per day.")
         else:
             raise ValueError(f"Unsupported freq_override type {type(freq_override)}. Please use a string. See "
                              f"https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases")
@@ -31,7 +33,7 @@ def obs_per_day(df, freq_override=None):
         else:
             raise ValueError(f"Must provide a 'freq_override' parameter when df.index type ({type(df.index).__name__}) "
                              f"is not DatetimeIndex")
-    print(f"Provided data (with a total of {len(df)} data points) contains {result} observations per day.")
+    LOGGER.info(f"Data provided (with a total of {len(df)} data points) contains {result} observations per day.")
     return result
 
 
@@ -52,12 +54,12 @@ def obs_per_day_for_datetimeindex(df):
     index_freq = df.index.freq
     if index_freq:
         freq_as_timedelta = pd.to_timedelta(index_freq)
-        print(f"Data provided has an index of type '{type(index_freq).__name__}' with a freq of {index_freq} "
-              f"(timedelta: {freq_as_timedelta})")
+        LOGGER.info(f"Data provided has an index of type '{type(index_freq).__name__}' with a freq of {index_freq} "
+                     f"(timedelta: {freq_as_timedelta})")
     else:
-        freq_as_timedelta = (df.index[1] - df.index[0])  # Timedelta representing distance between first two observations
-        print(f"Data provided has no index. Using the first two data points, we've derived a frequency timedelta of "
-              f"'{freq_as_timedelta}'.")
+        freq_as_timedelta = (df.index[1] - df.index[0])  # Timedelta representing distance between first two obs
+        LOGGER.info(f"Data provided has no index. Using the first two data points, we've derived a frequency "
+                     f"timedelta of '{freq_as_timedelta}'.")
     if freq_as_timedelta > timedelta(days=1):
         return 0
     s: Series = resample_first_day(df, freq_as_timedelta)

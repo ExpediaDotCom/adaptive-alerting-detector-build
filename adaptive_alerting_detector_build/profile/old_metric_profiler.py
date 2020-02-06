@@ -1,6 +1,11 @@
+import logging
+
 from .stationarity_annotator import annotate_stationarity
 from .stationarity_display import print_stationarity_report
 from .stationarity_types import AdfResultWrapper, StationarityResult, StationarityReport
+
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 
 def old_build_profile(df):
@@ -36,13 +41,13 @@ def old_build_profile(df):
         is_stationary = bool(adf_result_wrapper.adfstat < significance_value)
         stationarity_result = StationarityResult(is_stationary=is_stationary, adf_result=adf_result_wrapper)
 
-        print(f"\ncritvalue[{significance}]={result[4][significance]}, test_stat={result[0]}, p_value={result[1]}")
+        LOGGER.info(
+            f"\ncritvalue[{significance}]={result[4][significance]}, test_stat={result[0]}, p_value={result[1]}")
 
         stationarity_report: StationarityReport = annotate_stationarity(stationarity_result, max_adf_pvalue=0.05)
         print_stationarity_report(stationarity_report)
 
         return result[0] < result[4][significance]
-
 
     from .df_helper import df_values_as_array
     x = df_values_as_array(df)

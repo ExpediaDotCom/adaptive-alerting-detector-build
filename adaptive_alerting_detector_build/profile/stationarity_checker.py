@@ -4,11 +4,9 @@ from pandas import DataFrame
 from statsmodels.tools.sm_exceptions import MissingDataError
 from statsmodels.tsa.stattools import adfuller
 
+from .df_helper import df_values_as_array
 from .df_helper import obs_per_day
 from .stationarity_types import AdfResultWrapper, StationarityResult
-from .df_helper import df_values_as_array
-
-logger = logging.getLogger(__name__)
 
 DEFAULT_SIGNIFICANCE = "1%"
 DEFAULT_MAX_ADF_PVALUE = 0.05
@@ -17,6 +15,9 @@ DEFAULT_MAX_ADF_PVALUE = 0.05
 #   otherwise stattools.adfuller() will derive its own default
 # TODO: Make this configurable
 AUTO_LAG_THRESHOLD = 24
+
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 
 def stationarity_check(df: DataFrame,
@@ -61,7 +62,7 @@ def _adf_stationarity_test(df: DataFrame, freq_override: str = None, lags: int =
     lags = determine_lags_to_use(df, freq_override, lags)
     if lags > AUTO_LAG_THRESHOLD:
         try:
-            print(f"{lags} observations per day discovered. Using {lags} as maxlag setting for adfuller()")
+            LOGGER.info(f"{lags} observations per day discovered. Using {lags} as maxlag setting for adfuller()")
             (adfstat, pvalue, usedlag, nobs, critvalues) = adfuller(series, maxlag=lags, autolag=None)
             return AdfResultWrapper(adfstat, pvalue, usedlag, nobs, critvalues, icbest=None)
         except MissingDataError as e:
@@ -71,8 +72,8 @@ def _adf_stationarity_test(df: DataFrame, freq_override: str = None, lags: int =
         # There are less than AUTO_LAG_THRESHOLD observations per day.
         # Let ADFuller determine the best 'maxlags' value to use.
         # The algo will give us the `icbest` value in return
-        print(f"Less than {AUTO_LAG_THRESHOLD} observations per day discovered. We will let adfuller() decide "
-              f"number of lags. (default 12*({len(df)}/100)^(1/4)) ~= {12*(len(df)/100)**-.25}")
+        LOGGER.info(f"Less than {AUTO_LAG_THRESHOLD} observations per day discovered. We will let adfuller() decide "
+                     f"number of lags. (default 12*({len(df)}/100)^(1/4)) ~= {12 * (len(df) / 100) ** -.25}")
         try:
             (adfstat, pvalue, usedlag, nobs, critvalues, icbest) = adfuller(series)
             return AdfResultWrapper(adfstat, pvalue, usedlag, nobs, critvalues, icbest)
@@ -83,7 +84,7 @@ def _adf_stationarity_test(df: DataFrame, freq_override: str = None, lags: int =
 
 def determine_lags_to_use(df: DataFrame, freq_override: str, lags: int):
     if lags:
-        print(f"Lags value of {lags} provided. Skipping timestamp analysis.")
+        LOGGER.info(f"Lags value of {lags} provided. Skipping timestamp analysis.")
         return lags
     else:
         return obs_per_day(df, freq_override=freq_override)

@@ -1,3 +1,5 @@
+import logging
+
 from pandas import DataFrame
 
 from .stationarity_annotator import annotate_stationarity
@@ -5,6 +7,8 @@ from .stationarity_checker import stationarity_check, DEFAULT_SIGNIFICANCE, DEFA
 from .stationarity_display import print_stationarity_report
 from .stationarity_types import StationarityResult, StationarityReport
 
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 def build_profile(df: DataFrame, significance=DEFAULT_SIGNIFICANCE, max_adf_pvalue=DEFAULT_MAX_ADF_PVALUE,
                   freq: int = None, lags: str = None):
@@ -70,7 +74,7 @@ def _build_stationarity_report(stationarity_result, significance, max_adf_pvalue
     test_stat = stationarity_result.adf_result.adfstat
     p_value = stationarity_result.adf_result.pvalue
     crit_value = stationarity_result.adf_result.critvalues[significance]
-    print(f"\ncritvalue[{significance}]={crit_value}, test_stat={test_stat}, p_value={p_value}")
+    LOGGER.info(f"\ncritvalue[{significance}]={crit_value}, test_stat={test_stat}, p_value={p_value}")
     stationarity_report: StationarityReport = annotate_stationarity(stationarity_result,
                                                                     significance=significance,
                                                                     max_adf_pvalue=max_adf_pvalue)
