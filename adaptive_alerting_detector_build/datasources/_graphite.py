@@ -22,7 +22,7 @@ class graphite(base_datasource):
             if interval:
                 query = f"{query}|summarize('{interval}','{fn}')"
             params = {"target": query, "from": start, "until": end, "format": "json"}
-            response = requests.get(self._render_url, params=params, timeout=1)
+            response = requests.get(self._render_url, params=params, timeout=60)
             response.raise_for_status()
             data = map(
                 lambda d: {"time": d[1], "value": d[0]},
