@@ -42,7 +42,7 @@ class DetectorClient:
 
     def get_detector(self, detector_uuid):
         response = requests.get(
-            f"{self._url}/modelservice/api/v2/detectors/findByUuid?uuid={detector_uuid}"
+            f"{self._url}/api/v2/detectors/findByUuid?uuid={detector_uuid}"
         )
         response.raise_for_status()
         detector = related.from_json(response.text, Detector)
@@ -51,7 +51,7 @@ class DetectorClient:
 
     def list_detectors_for_metric(self, metric_tags):
         response = requests.post(
-            f"{self._url}/modelservice/api/detectorMappings/findMatchingByTags",
+            f"{self._url}/api/detectorMappings/findMatchingByTags",
             json=[metric_tags],
         )
         response.raise_for_status()
@@ -70,7 +70,7 @@ class DetectorClient:
         """
         metric_detector_mapping = build_metric_detector_mapping(detector_uuid, metric)
         create_metric_detector_mapping = requests.post(
-            f"{self._url}/modelservice/api/v2/detectorMappings", json=related.to_dict(metric_detector_mapping),
+            f"{self._url}/api/detectorMappings", json=related.to_dict(metric_detector_mapping),
             timeout=30
         )
         create_metric_detector_mapping.raise_for_status()
@@ -83,7 +83,7 @@ class DetectorClient:
         """
         create_detector_request = related.to_dict(detector, suppress_empty_values=True)
         create_detector_response = requests.post(
-            f"{self._url}/modelservice/api/v2/detectors", json=create_detector_request,
+            f"{self._url}/api/v2/detectors", json=create_detector_request,
             timeout=30
         )
         create_detector_response.raise_for_status()
@@ -107,7 +107,7 @@ class DetectorClient:
           current value is used.
         """
         response = requests.put(
-            f"{self._url}/modelservice/api/v2/detectors?uuid={detector.uuid}", json=related.to_dict(detector), timeout=30
+            f"{self._url}/api/v2/detectors?uuid={detector.uuid}", json=related.to_dict(detector), timeout=30
         )
         response.raise_for_status()
         return self.get_detector(detector.uuid)
@@ -117,7 +117,7 @@ class DetectorClient:
 
         """
         response = requests.delete(
-            f"{self._url}/modelservice/api/v2/detectors?uuid={detector.uuid}", timeout=30
+            f"{self._url}/api/v2/detectors?uuid={detector.uuid}", timeout=30
         )
         response.raise_for_status()
 
@@ -127,14 +127,14 @@ class DetectorClient:
         
         """
         new_detector = self.create_detector(detector)
-        new_mapping = self.save_metric_detector_mapping(new_detector.uuid, metric)
+        self.save_metric_detector_mapping(new_detector.uuid, metric)
 
 
-    def delete_metric_detector(self, detector_uuid, ):
+    def delete_metric_detector(self, detector_uuid):
         """
         
         """
         response = requests.delete(
-            f"{self._url}/modelservice/api/v2/detectors?uuid={detector.uuid}", timeout=30
+            f"{self._url}/api/v2/detectors?uuid={detector_uuid}", timeout=30
         )
         response.raise_for_status()

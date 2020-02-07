@@ -10,13 +10,13 @@ from tests.conftest import FIND_BY_MATCHING_TAGS_MOCK_RESPONSE, FIND_BY_MATCHING
 
 @responses.activate
 def test_detector_client_list_detectors_for_metric(mock_metric):
-    responses.add(responses.POST, "http://modelservice/modelservice/api/detectorMappings/findMatchingByTags",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     detector_client = DetectorClient()
@@ -29,16 +29,16 @@ def test_detector_client_list_detectors_for_metric(mock_metric):
 
 @responses.activate
 def test_build_metric_detectors(mock_metric):
-    responses.add(responses.POST, "http://modelservice/modelservice/api/detectorMappings/findMatchingByTags",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.POST, "http://modelservice/modelservice/api/v2/detectorMappings",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings",
             json=[],
             status=200)
-    responses.add(responses.POST, "http://modelservice/modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
             body="4fdc3395-e969-449a-a306-201db183c6d7",
             status=201)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
 

@@ -97,11 +97,12 @@ class ConstantThresholdDetector(Detector):
     def train(self, data):
         """
         """
+        data_drop_nan = data.dropna(axis=0, how="any", inplace=False)
         strategy = self.config.hyperparameters.strategy
         if strategy == ConstantThresholdStrategy.SIGMA:
-            self._train_sigma(data)
+            self._train_sigma(data_drop_nan)
         elif strategy == ConstantThresholdStrategy.QUARTILE:
-            self._train_quartile(data)
+            self._train_quartile(data_drop_nan)
 
     def _train_sigma(self, sample):
         """Performs threshold calculations using sigma (standard deviation) strategy.
