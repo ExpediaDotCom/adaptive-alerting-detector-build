@@ -148,16 +148,16 @@ def test_build_detector_with_invalid_strategy_raises_build_error(mock_metric):
 
 @responses.activate
 def test_train_detector_with_invalid_sample_size_raises_build_error(mock_metric):
-    responses.add(responses.POST, "http://modelservice/modelservice/api/detectorMappings/findMatchingByTags",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.POST, "http://modelservice/modelservice/api/v2/detectorMappings",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings",
             json=[],
             status=200)
-    responses.add(responses.POST, "http://modelservice/modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
             body="4fdc3395-e969-449a-a306-201db183c6d7",
             status=201)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
     test_metric = mock_metric(data=[3])

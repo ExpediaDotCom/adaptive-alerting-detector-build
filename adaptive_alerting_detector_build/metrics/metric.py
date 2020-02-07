@@ -6,10 +6,10 @@ from adaptive_alerting_detector_build.profile.metric_profiler import build_profi
 
 class Metric:
 
-    def __init__(self, config, datasource_config, model_service_url=None):
+    def __init__(self, config, datasource_config, model_service_url=None, model_service_user=None):
         self.config = config
         self._datasource = datasource(datasource_config)
-        self._detector_client = DetectorClient(model_service_url=model_service_url)
+        self._detector_client = DetectorClient(model_service_url=model_service_url, model_service_user=model_service_user)
         self._sample_data = None
         self._profile = None
 
