@@ -24,10 +24,11 @@ class graphite(base_datasource):
             params = {"target": query, "from": start, "until": end, "format": "json"}
             response = requests.get(self._render_url, params=params, timeout=60)
             response.raise_for_status()
-            data = map(
-                lambda d: {"time": d[1], "value": d[0]},
-                response.json()[0]["datapoints"],
-            )
+            response_list = response.json()
+            data = list()
+            if response_list:
+                for datapoint in response.json()[0]["datapoints"]:
+                    data.append({"time": datapoint[1], "value": datapoint[0]})
             df = pd.DataFrame(data, columns=["time", "value"])
             datetime_series = pd.to_datetime(df["time"], unit="s")
             datetime_index = pd.DatetimeIndex(datetime_series.values)
