@@ -122,7 +122,7 @@ def test_build_detector_with_quartile_strategy(mock_metric):
             strategy="quartile", weak_multiplier=1.5, strong_multiplier=3.0
         )
     )
-    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
+    test_metric = mock_metric(data=[5, 4, 7, 9, 15, None, 1, 0])
     test_detector = build_detector("constant-detector", detector_config)
     data = test_metric.query()
     test_detector.train(data)
