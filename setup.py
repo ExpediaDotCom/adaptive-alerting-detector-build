@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
+from adaptive_alerting_detector_build import __version__
 import io
 
 setup(
     name="adaptive-alerting-detector-build",
-    version="0.0.1",
+    version=__version__,
     description="Adaptive Alerting Detector Build",
     long_description=io.open("README.md", encoding="utf-8").read(),
     author="Expedia Group",
@@ -32,6 +33,6 @@ setup(
     ],
     classifiers=["Programming Language :: Python :: 3",],
     entry_points = {
-        "console_scripts": ["adaptive-alerting=adaptive_alerting_detector_build.cli:main"],
+        "console_scripts": ["adaptive-alerting=adaptive_alerting_detector_build.cli:console_script_entrypoint"],
     },
 )

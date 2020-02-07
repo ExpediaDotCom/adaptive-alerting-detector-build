@@ -1,0 +1,10 @@
+[
+  {
+    "name": "my metric",
+    "description": "a good metric",
+    "tags": {
+      "role": "my-app-web",
+      "what": "elb_2xx"
+    }
+  }
+]
