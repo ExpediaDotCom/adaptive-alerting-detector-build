@@ -76,7 +76,9 @@ def build_detectors_for_metric_configs(metric_configs):
         try:
             new_detectors = metric.build_detectors()
             for detector in new_detectors:
-                logging.info(f"New {detector.type} detector created with UUID: {detector.uuid}")
+                logging.info(f"New '{detector.type}' detector created with UUID: {detector.uuid}")
+            if not new_detectors:
+                logging.info(f"No detectors built for metric '{metric_config.name}'")
         except Exception as e:
             logging.exception(f"Exception {e.__class__.__name__} while creating detector for metric {metric_config.name}! Skipping!")
             trace = traceback.format_exc()
@@ -97,7 +99,7 @@ def console_script_entrypoint():
     exit_code = 0
 
     if args["delete"]:
-        logging.info("Delete feature is not yet implemented.")
+        logging.info("'delete' is not yet implemented.")
         exit_code = 2
 
     elif args["build"]:
