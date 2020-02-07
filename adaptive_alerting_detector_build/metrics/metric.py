@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 from adaptive_alerting_detector_build.datasources import datasource
 from adaptive_alerting_detector_build.detectors import build_detector, DetectorClient
-from adaptive_alerting_detector_build.metric_profiler import build_profile
+from adaptive_alerting_detector_build.profile.metric_profiler import build_profile
 
 class Metric:
 
