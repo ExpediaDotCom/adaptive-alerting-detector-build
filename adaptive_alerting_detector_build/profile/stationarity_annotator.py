@@ -25,7 +25,7 @@ def annotate_stationarity(stationarity_result: StationarityResult, timeseries_na
 
 def _stationarity_details(is_stationary):
     result = f"{'IS' if is_stationary else 'is NOT'} stationary "
-    result += f"(we {'can' if is_stationary else 'cannot'} reject the Null Hypothesis that there is a unit root).\n"
+    result += f"(we {'can' if is_stationary else 'cannot'} reject the Null Hypothesis that there is a unit root)\n"
     result += f"{'At least one of' if is_stationary else 'None of'} these Stationarity tests PASSED:"
     return result
 

@@ -22,8 +22,9 @@ def build_profile(df: DataFrame, significance=DEFAULT_SIGNIFICANCE, max_adf_pval
                  See https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
                  If None is provided, df.index must be of time Datetimestamp, freq will then be derived from either
                  df.index.freq or the timestamps in df.index
-    :param lags: The number of lags that should be checked for unit root. If None, defaults to number of observations
-                 per day (which is derived from the frequency observed in timestamps in provided df)
+    :param lags: The number of lags that should be checked for unit root (i.e. is non-stationary).
+                 If None, defaults to number of observations per day (which is derived from the frequency observed in
+                 timestamps in provided df)
     :return: boolean indicating whether the time series is stationary, assuming the given significance level
     :return: Timeseries feature profile
     """
@@ -46,8 +47,9 @@ def _is_stationary(df: DataFrame, significance: str, max_adf_pvalue: float, freq
                  See https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
                  If None is provided, df.index must be of time Datetimestamp, freq will then be derived from either
                  df.index.freq or the timestamps in df.index
-    :param lags: The number of lags that should be checked for unit root. If None, defaults to number of observations
-                 per day (which is derived from the frequency observed in timestamps in provided df)
+    :param lags: The number of lags that should be checked for unit root (i.e. is non-stationary).
+                 If None, defaults to number of observations per day (which is derived from the frequency observed in
+                 timestamps in provided df)
     :return: boolean indicating whether the time series is stationary, assuming the given significance level
     """
     stationarity_result: StationarityResult = _try_stationarity_check(df=df,

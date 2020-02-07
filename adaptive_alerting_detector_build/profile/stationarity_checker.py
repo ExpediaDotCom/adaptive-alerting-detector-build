@@ -27,15 +27,19 @@ def stationarity_check(df: DataFrame,
                        lags: int = None) -> StationarityResult:
     """
     Performs a stationarity check using stattools.adfuller().
-    Wraps the resulting array in a stronger AdfResultWrapper type.
-    Performs a test using the given max_adf_pvalue and significance.  Results
+    Wraps the array result of calling adfuller() in a stronger AdfResultWrapper type.
+    Performs a test using the given max_adf_pvalue and significance.
+    NOTE: The augmented Dickey–Fuller (ADF) statistic, used in adfuller, is a negative number. The more negative it is,
+    the stronger the rejection of the hypothesis that there is a unit root at some level of confidence.
+    For more, see: https://en.wikipedia.org/wiki/Augmented_Dickey%E2%80%93Fuller_test
     :param df: Pandas DataFrame with DateTimeIndex
     :param freq: Frequency string such as '1D' for 1 day, '5T' for 5 minutes, etc.
                  See https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
     :param max_adf_pvalue: Augmented Dicker-Fuller test result must be less than or equal to this number
     :param significance: Which significance value should be used for test? Valid values are "1%", "5%" and "10%"
-    :param lags: The number of lags that should be checked for unit root. If None, defaults to number of observations
-                 per day (which is derived from the frequency observed in timestamps in provided df)
+    :param lags: The number of lags that should be checked for unit root (i.e. is non-stationary).
+                 If None, defaults to number of observations per day (which is derived from the frequency observed in
+                 timestamps in provided df)
     :return: StationarityResult
     """
     adf_result: AdfResultWrapper = _adf_stationarity_test(df=df, freq_override=freq, lags=lags)
@@ -54,8 +58,9 @@ def _adf_stationarity_test(df: DataFrame, freq_override: str = None, lags: int =
 
     :param df: Pandas DataFrame with DateTimeIndex
     :param freq_override: Explicit frequency to use in cases where provided df does not have a DateTimeIndex index
-    :param lags: The number of lags that should be checked for unit root. If None, defaults to number of observations
-                 per day (which is derived from the frequency observed in timestamps in provided df)
+    :param lags: The number of lags that should be checked for unit root (i.e. is non-stationary).
+                 If None, defaults to number of observations per day (which is derived from the frequency observed in
+                 timestamps in provided df)
     :return: AdfResultWrapper with icbest = None when lags (provided or auto-derived) > AUTO_LAG_THRESHOLD
     """
     series = df_values_as_array(df)
