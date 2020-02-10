@@ -8,13 +8,13 @@ from tests.conftest import GRAPHITE_MOCK_RESPONSE
 
 @responses.activate
 def test_cli_build_detectors_alredy_exists(caplog):
-    responses.add(responses.POST, "http://modelservice/modelservice/api/detectorMappings/findMatchingByTags",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     responses.add(
@@ -32,16 +32,16 @@ def test_cli_build_detectors_alredy_exists(caplog):
 
 @responses.activate
 def test_cli_build_new_detectors(caplog):
-    responses.add(responses.POST, "http://modelservice/modelservice/api/detectorMappings/findMatchingByTags",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.POST, "http://modelservice/modelservice/api/v2/detectorMappings",
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings",
             json=[],
             status=200)
-    responses.add(responses.POST, "http://modelservice/modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
             body="4fdc3395-e969-449a-a306-201db183c6d7",
             status=201)
-    responses.add(responses.GET, "http://modelservice/modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
     responses.add(
