@@ -26,7 +26,33 @@
       }
     },
     {
-      "uuid": "47a0661d-aceb-4ef2-bf06-0828f28631b4",
+      "uuid": "49186d13-b106-476d-ba23-c332c325fb15",
+      "type": "constant-detector",
+      "enabled": true,
+      "trusted": true,
+      "meta": {
+        "dateCreated": null,
+        "dateUpdated": "2019-11-13T23:24:21.226+0000",
+        "createdBy": null,
+        "updatedBy": null
+      },
+      "dateCreated": null,
+      "lastUpdateTimestamp": "2019-11-13 23:24:21",
+      "createdBy": "a_username",
+      "detectorConfig": {
+        "hyperparams": {},
+        "params": {
+          "type": "RIGHT_TAILED",
+          "thresholds": {
+            "upperWeak": 89,
+            "upperStrong": 210
+          }
+        },
+        "trainingMetaData": {}
+      }
+    },
+    {
+      "uuid": "16769303-a950-4d0f-a5a6-8d00eef886ec",
       "type": "constant-detector",
       "enabled": true,
       "trusted": true,

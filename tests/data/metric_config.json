@@ -1,10 +1,29 @@
 [
   {
-    "name": "my metric",
-    "description": "a good metric",
+    "name": "My App Request Count",
+    "type": "REQUEST_COUNT",
+    "description": "Sum of requests received.",
     "tags": {
-      "role": "my-app-web",
+      "app": "my-web-app",
       "what": "elb_2xx"
+    }
+  },
+  {
+    "name": "My App Error Count",
+    "type": "ERROR_COUNT",
+    "description": "Sum of errors received.",
+    "tags": {
+      "app": "my-web-app",
+      "what": "elb_5xx"
+    }
+  },
+  {
+    "name": "My App Success Rate",
+    "type": "SUCCESS_RATE",
+    "description": "Ratio of Requests Count vs Errors Count (1 - (ERROR_COUNT/REQUEST_COUNT))",
+    "tags": {
+      "app": "my-web-app",
+      "what": "elb_success_rate"
     }
   }
 ]

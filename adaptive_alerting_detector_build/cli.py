@@ -33,21 +33,15 @@ import related
 import sys
 import traceback
 
-from .config import get_datasource_config
 from .exceptions import AdaptiveAlertingDetectorBuildError
-from .metrics import Metric
+from .metrics import Metric, MetricConfig
 from . import __version__
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-@related.immutable
-class MetricConfig:
-    name = related.StringField()
-    tags = related.ChildField(dict)
-    description = related.StringField(required=False)
-    datasource = related.ChildField(dict, default=get_datasource_config(), required=False)
+
 
 
 def read_config_file(json_config_file_path):

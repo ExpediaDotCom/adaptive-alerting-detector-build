@@ -23,13 +23,13 @@ LOG_LEVEL=DEBUG
 
 ```
 # Load metric configuration Metric(config, datasource_config, optional: model_service_url)
-metric = Metric({"tags": {"app": "myApplication", "metric": "request_count"}}, {"url": "http://graphite"})
+metric = Metric({"tags": {"app": "myApplication", "type": "REQUEST_COUNT", "metric": "request_count"}}, {"url": "http://graphite"})
 
 # Get detectors assocated to the metric
 metric.detectors
 
-# Get detectors assocated to the metric
-metric.detectors
+# Build detectors for a metric
+metric.build_detectors()
 ```
 
 # User Environment
