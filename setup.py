@@ -15,24 +15,27 @@ setup(
     install_requires=[
         "attrs==19.3.0",
         "cycler==0.10.0",
-        "dataclasses==0.6",
         "docopt==0.6.2",
+        "future==0.18.2",
         "kiwisolver==1.1.0",
-        "matplotlib==3.1.2",
+        "matplotlib==3.1.3",
         "numpy==1.18.1",
-        "pandas==0.25.3",
+        "pandas==1.0.0",
         "patsy==0.5.1",
         "pyparsing==2.4.6",
         "python-dateutil==2.8.1",
         "pytz==2019.3",
+        "pyyaml==5.3",
         "related==0.7.2",
         "scipy==1.4.1",
-        "seaborn==0.9.0",
-        "six==1.13.0",
-        "statsmodels==0.10.2",
+        "seaborn==0.10.0",
+        "six==1.14.0",
+        "statsmodels==0.11.0",
     ],
     classifiers=["Programming Language :: Python :: 3",],
-    entry_points = {
-        "console_scripts": ["adaptive-alerting=adaptive_alerting_detector_build.cli:console_script_entrypoint"],
+    entry_points={
+        "console_scripts": [
+            "adaptive-alerting=adaptive_alerting_detector_build.cli:console_script_entrypoint"
+        ],
     },
 )

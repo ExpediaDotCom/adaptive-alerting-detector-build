@@ -10,7 +10,7 @@
         {
           "field": {
             "key": "role",
-            "value": "my-app-web"
+            "value": "my-web-app"
           },
           "expression": null
         },

@@ -8,13 +8,13 @@ import json
 def test_graphite_query():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('role=my-app-web','what=elb_2xx'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json",
         json=json.loads(open("tests/data/graphite_mock.json").read()),
         status=200,
     )
     graphite_datasource = graphite(url="http://graphite")
     df = graphite_datasource.query(
-        tags={"role": "my-app-web", "what": "elb_2xx"}, start="-168hours", end="now"
+        tags={"role": "my-web-app", "what": "elb_2xx"}, start="-168hours", end="now"
     )
     assert isinstance(df, pd.DataFrame)
     assert isinstance(df.index, pd.DatetimeIndex)
@@ -24,13 +24,13 @@ def test_graphite_query():
 def test_graphite_query_with_interval():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('role=my-app-web','what=elb_2xx'))|summarize('1min','sum')&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))|summarize('1min','sum')&from=-168hours&until=now&format=json",
         json=json.loads(open("tests/data/graphite_mock.json").read()),
         status=200,
     )
     graphite_datasource = graphite(url="http://graphite")
     df = graphite_datasource.query(
-        tags={"role": "my-app-web", "what": "elb_2xx"},
+        tags={"role": "my-web-app", "what": "elb_2xx"},
         start="-168hours",
         end="now",
         interval="1min",
@@ -42,13 +42,13 @@ def test_graphite_query_with_interval():
 def test_graphite_query_with_empty_response():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('role=my-app-web','what=elb_2xx'))|summarize('1min','sum')&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))|summarize('1min','sum')&from=-168hours&until=now&format=json",
         json=[],
         status=200,
     )
     graphite_datasource = graphite(url="http://graphite")
     df = graphite_datasource.query(
-        tags={"role": "my-app-web", "what": "elb_2xx"},
+        tags={"role": "my-web-app", "what": "elb_2xx"},
         start="-168hours",
         end="now",
         interval="1min",

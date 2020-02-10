@@ -1,8 +1,28 @@
+from enum import unique, Enum
+import related
 import requests
-import pandas as pd
+from adaptive_alerting_detector_build.config import get_datasource_config
 from adaptive_alerting_detector_build.datasources import datasource
 from adaptive_alerting_detector_build.detectors import build_detector, DetectorClient
 from adaptive_alerting_detector_build.profile.metric_profiler import build_profile
+
+
+@unique
+class MetricType(Enum):
+    REQUEST_COUNT = "REQUEST_COUNT"
+    ERROR_COUNT = "ERROR_COUNT"
+    SUCCESS_RATE = "SUCCESS_RATE"
+    LATENCY_AVG = "LATENCY_AVG"
+
+
+@related.immutable
+class MetricConfig:
+    name = related.StringField()
+    type = related.ChildField(MetricType)
+    tags = related.ChildField(dict)
+    description = related.StringField(required=False)
+    datasource = related.ChildField(dict, default=get_datasource_config(), required=False)
+
 
 class Metric:
 
