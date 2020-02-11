@@ -16,10 +16,17 @@ class AdfResultWrapper:
     icbest: float
 
     def pprints(self):
-        dfoutput = pd.Series([self.adfstat, self.pvalue, self.usedlag, self.nobs],
-                             index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+        dfoutput = pd.Series(
+            [self.adfstat, self.pvalue, self.usedlag, self.nobs],
+            index=[
+                "Test Statistic",
+                "p-value",
+                "#Lags Used",
+                "Number of Observations Used",
+            ],
+        )
         for key, value in self.critvalues.items():
-            dfoutput['Critical Value (%s)' % key] = value
+            dfoutput["Critical Value (%s)" % key] = value
         return convert_df_to_str(dfoutput)
 
 

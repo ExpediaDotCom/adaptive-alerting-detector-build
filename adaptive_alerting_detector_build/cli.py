@@ -41,9 +41,6 @@ from . import __version__
 LOGGER = logging.getLogger(__name__)
 
 
-
-
-
 def read_config_file(json_config_file_path):
     metric_configs = list()
     exit_code = 0
@@ -57,11 +54,14 @@ def read_config_file(json_config_file_path):
                 metric_config = related.to_model(MetricConfig, raw_metric_config)
                 metric_configs.append(metric_config)
     except Exception as e:
-        logging.exception(f"Exception {e.__class__.__name__} while reading config file '{json_config_file_path}'! Skipping!")
+        logging.exception(
+            f"Exception {e.__class__.__name__} while reading config file '{json_config_file_path}'! Skipping!"
+        )
         trace = traceback.format_exc()
         logging.debug(f"Traceback: {trace}")
         exit_code = 1
     return (metric_configs, exit_code)
+
 
 def build_detectors_for_metric_configs(metric_configs):
     exit_code = 0
@@ -70,11 +70,15 @@ def build_detectors_for_metric_configs(metric_configs):
         try:
             new_detectors = metric.build_detectors()
             for detector in new_detectors:
-                logging.info(f"New '{detector.type}' detector created with UUID: {detector.uuid}")
+                logging.info(
+                    f"New '{detector.type}' detector created with UUID: {detector.uuid}"
+                )
             if not new_detectors:
                 logging.info(f"No detectors built for metric '{metric_config.name}'")
         except Exception as e:
-            logging.exception(f"Exception {e.__class__.__name__} while creating detector for metric {metric_config.name}! Skipping!")
+            logging.exception(
+                f"Exception {e.__class__.__name__} while creating detector for metric {metric_config.name}! Skipping!"
+            )
             trace = traceback.format_exc()
             logging.debug(f"Traceback: {trace}")
             exit_code = 1
@@ -85,6 +89,7 @@ def train_detectors_for_metric_configs(metric_configs):
     exit_code = 0
     return exit_code
 
+
 def delete_detectors_for_metric_configs(metric_configs):
     exit_code = 0
     for metric_config in metric_configs:
@@ -92,15 +97,22 @@ def delete_detectors_for_metric_configs(metric_configs):
         try:
             deleted_detectors = metric.delete_detectors()
             for detector in deleted_detectors:
-                logging.info(f"Detector/Detector Mapping with UUID '{detector.uuid}' deleted.")
+                logging.info(
+                    f"Detector/Detector Mapping with UUID '{detector.uuid}' deleted."
+                )
             if not deleted_detectors:
-                logging.info(f"No detectors to delete for metric '{metric_config.name}'")
+                logging.info(
+                    f"No detectors to delete for metric '{metric_config.name}'"
+                )
         except Exception as e:
-            logging.exception(f"Exception {e.__class__.__name__} while deleting detectors for metric {metric_config.name}! Skipping!")
+            logging.exception(
+                f"Exception {e.__class__.__name__} while deleting detectors for metric {metric_config.name}! Skipping!"
+            )
             trace = traceback.format_exc()
             logging.debug(f"Traceback: {trace}")
             exit_code = 1
     return exit_code
+
 
 def console_script_entrypoint():
     logging.basicConfig(level=logging.INFO)
@@ -132,4 +144,3 @@ def console_script_entrypoint():
             logging.info("Done")
 
     sys.exit(exit_code)
-

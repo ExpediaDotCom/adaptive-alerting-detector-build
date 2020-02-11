@@ -20,11 +20,13 @@ logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 
-def stationarity_check(df: DataFrame,
-                       freq: str = None,
-                       max_adf_pvalue: float = DEFAULT_MAX_ADF_PVALUE,
-                       significance: str = DEFAULT_SIGNIFICANCE,
-                       lags: int = None) -> StationarityResult:
+def stationarity_check(
+    df: DataFrame,
+    freq: str = None,
+    max_adf_pvalue: float = DEFAULT_MAX_ADF_PVALUE,
+    significance: str = DEFAULT_SIGNIFICANCE,
+    lags: int = None,
+) -> StationarityResult:
     """
     Performs a stationarity check using stattools.adfuller().
     Wraps the array result of calling adfuller() in a stronger AdfResultWrapper type.
@@ -42,7 +44,9 @@ def stationarity_check(df: DataFrame,
                  timestamps in provided df)
     :return: StationarityResult
     """
-    adf_result: AdfResultWrapper = _adf_stationarity_test(df=df, freq_override=freq, lags=lags)
+    adf_result: AdfResultWrapper = _adf_stationarity_test(
+        df=df, freq_override=freq, lags=lags
+    )
     significance_value = adf_result.critvalues[significance]
     passes_significance_test = adf_result.adfstat < significance_value
     # Should we use p-value at all?
@@ -53,7 +57,9 @@ def stationarity_check(df: DataFrame,
     return StationarityResult(is_stationary=is_stationary, adf_result=adf_result)
 
 
-def _adf_stationarity_test(df: DataFrame, freq_override: str = None, lags: int = None) -> AdfResultWrapper:
+def _adf_stationarity_test(
+    df: DataFrame, freq_override: str = None, lags: int = None
+) -> AdfResultWrapper:
     """
 
     :param df: Pandas DataFrame with DateTimeIndex
@@ -67,24 +73,36 @@ def _adf_stationarity_test(df: DataFrame, freq_override: str = None, lags: int =
     lags = determine_lags_to_use(df, freq_override, lags)
     if lags > AUTO_LAG_THRESHOLD:
         try:
-            LOGGER.info(f"{lags} observations per day discovered. Using {lags} as maxlag setting for adfuller()")
-            (adfstat, pvalue, usedlag, nobs, critvalues) = adfuller(series, maxlag=lags, autolag=None)
-            return AdfResultWrapper(adfstat, pvalue, usedlag, nobs, critvalues, icbest=None)
+            LOGGER.info(
+                f"{lags} observations per day discovered. Using {lags} as maxlag setting for adfuller()"
+            )
+            (adfstat, pvalue, usedlag, nobs, critvalues) = adfuller(
+                series, maxlag=lags, autolag=None
+            )
+            return AdfResultWrapper(
+                adfstat, pvalue, usedlag, nobs, critvalues, icbest=None
+            )
         except MissingDataError as e:
             logging.error(f"Error running adfuller test: {e}")
-            raise ValueError("Error running adfuller test, provided data contains missing values") from e
+            raise ValueError(
+                "Error running adfuller test, provided data contains missing values"
+            ) from e
     else:
         # There are less than AUTO_LAG_THRESHOLD observations per day.
         # Let ADFuller determine the best 'maxlags' value to use.
         # The algo will give us the `icbest` value in return
-        LOGGER.info(f"Less than {AUTO_LAG_THRESHOLD} observations per day discovered. We will let adfuller() decide "
-                     f"number of lags. (default 12*({len(df)}/100)^(1/4)) ~= {12 * (len(df) / 100) ** -.25}")
+        LOGGER.info(
+            f"Less than {AUTO_LAG_THRESHOLD} observations per day discovered. We will let adfuller() decide "
+            f"number of lags. (default 12*({len(df)}/100)^(1/4)) ~= {12 * (len(df) / 100) ** -.25}"
+        )
         try:
             (adfstat, pvalue, usedlag, nobs, critvalues, icbest) = adfuller(series)
             return AdfResultWrapper(adfstat, pvalue, usedlag, nobs, critvalues, icbest)
         except MissingDataError as e:
             logging.error(f"Error running adfuller test: {e}")
-            raise ValueError("Error running adfuller test, provided data contains missing values") from e
+            raise ValueError(
+                "Error running adfuller test, provided data contains missing values"
+            ) from e
 
 
 def determine_lags_to_use(df: DataFrame, freq_override: str, lags: int):

@@ -21,15 +21,20 @@ class MetricConfig:
     type = related.ChildField(MetricType)
     tags = related.ChildField(dict)
     description = related.StringField(required=False)
-    datasource = related.ChildField(dict, default=get_datasource_config(), required=False)
+    datasource = related.ChildField(
+        dict, default=get_datasource_config(), required=False
+    )
 
 
 class Metric:
-
-    def __init__(self, config, datasource_config, model_service_url=None, model_service_user=None):
+    def __init__(
+        self, config, datasource_config, model_service_url=None, model_service_user=None
+    ):
         self.config = config
         self._datasource = datasource(datasource_config)
-        self._detector_client = DetectorClient(model_service_url=model_service_url, model_service_user=model_service_user)
+        self._detector_client = DetectorClient(
+            model_service_url=model_service_url, model_service_user=model_service_user
+        )
         self._sample_data = None
         self._profile = None
 
@@ -59,10 +64,10 @@ class Metric:
             if selected_detector["type"] not in existing_detector_types:
                 detector = build_detector(**selected_detector)
                 detector.train(data=self.query())
-                new_detector = self._detector_client.create_detector(
-                    detector)
+                new_detector = self._detector_client.create_detector(detector)
                 self._detector_client.save_metric_detector_mapping(
-                    new_detector.uuid, self)
+                    new_detector.uuid, self
+                )
                 new_detectors.append(new_detector)
         return new_detectors
 
@@ -72,9 +77,13 @@ class Metric:
         """
         deleted_detectors = []
         for detector in self.detectors:
-            detector_mappings = self._detector_client.list_detector_mappings(detector.uuid)
+            detector_mappings = self._detector_client.list_detector_mappings(
+                detector.uuid
+            )
             for detector_mapping in detector_mappings:
-                self._detector_client.delete_metric_detector_mapping(detector_mapping.id)
+                self._detector_client.delete_metric_detector_mapping(
+                    detector_mapping.id
+                )
             self._detector_client.delete_detector(detector.uuid)
             deleted_detectors.append(detector)
         return deleted_detectors
@@ -89,7 +98,7 @@ class Metric:
                 hyperparameters=dict(
                     strategy="sigma", weak_multiplier=3.0, strong_multiplier=4.0
                 )
-            )
+            ),
         )
         return [constant_threshold_detector]
 

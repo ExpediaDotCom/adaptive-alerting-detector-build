@@ -2,6 +2,7 @@ import related
 from . import Detector
 from .exceptions import DetectorBuilderError
 
+
 def get_detector_class(type):
     DETECTORS = {c.id: c for c in Detector.__subclasses__()}
     _detector_class = DETECTORS.get(type)
