@@ -20,14 +20,18 @@ class DetectorMappingOperand:
 class DetectorMappingExpression:
     operands = related.SequenceField(DetectorMappingOperand)
     operator = related.StringField(default="AND")
-    
 
 @related.immutable
 class DetectorMapping:
     detector = related.ChildField(DetectorUUID)
     expression = related.ChildField(DetectorMappingExpression)
-    fields = related.SequenceField(str)
     user = related.ChildField(DetectorMappingUser)
+    fields = related.SequenceField(str, required=False)
+    id = related.StringField(required=False)
+    last_modified_time_in_millis = related.IntegerField(required=False, key="lastModifiedTimeInMillis")
+    created_time_in_millis = related.IntegerField(required=False, key="createdTimeInMillis")
+    enabled = related.BooleanField(required=False)
+
 
 def build_metric_detector_mapping(detector_uuid, metric):
     operands = list()
@@ -53,4 +57,4 @@ def build_metric_detector_mapping(detector_uuid, metric):
         "user": {
             "id": MODEL_SERVICE_USER
         }
-        })
+    })

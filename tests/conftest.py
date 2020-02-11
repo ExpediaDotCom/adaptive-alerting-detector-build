@@ -25,17 +25,20 @@ from adaptive_alerting_detector_build.metrics import Metric
 
 
 
-GRAPHITE_MOCK_RESPONSE = json.loads(open('tests/data/graphite_mock.json').read())
+GRAPHITE_MOCK_RESPONSE = json.loads(open('tests/data/graphite-mock.json').read())
+
+DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE = json.loads(
+    open('tests/data/detector-mappings-mock.json').read())
 
 FIND_BY_MATCHING_TAGS_MOCK_RESPONSE = json.loads(
-    open('tests/data/find_matching_by_tags_mock.json').read())
+    open('tests/data/find-matching-by-tags-mock.json').read())
 
 FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE = json.loads(
-    open('tests/data/find_matching_by_tags_empty_mock.json').read())
+    open('tests/data/find-matching-by-tags-empty-mock.json').read())
 
-MOCK_DETECTORS =  json.loads(open('tests/data/detectors_mock.json').read())
+MOCK_DETECTORS =  json.loads(open('tests/data/detectors-mock.json').read())
 
-METRIC_DETECTOR_MAPPINGS = json.loads(open("tests/data/metric_detector_mappings_mock.json").read())
+METRIC_DETECTOR_MAPPINGS = json.loads(open("tests/data/metric-detector-mappings-mock.json").read())
 
 @pytest.fixture
 @responses.activate

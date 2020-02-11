@@ -17,6 +17,7 @@ setup(
         "certifi==2019.11.28",
         "chardet==3.0.4",
         "cycler==0.10.0",
+        "dataclasses==0.6",
         "docopt==0.6.2",
         "future==0.18.2",
         "idna==2.8",

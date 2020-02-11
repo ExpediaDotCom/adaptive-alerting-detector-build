@@ -62,6 +62,17 @@ class DetectorClient:
                 detectors.append(self.get_detector(detector["uuid"]))
         return detectors
 
+    def list_detector_mappings(self, detector_uuid):
+        response = requests.post(
+            f"{self._url}/api/detectorMappings/search",
+            json={ "detectorUuid": detector_uuid }
+        )
+        response.raise_for_status()
+        detector_mappings = list()
+        for detector_mapping in response.json():
+            detector_mappings.append(related.from_json(json.dumps(detector_mapping), DetectorMapping))
+        return detector_mappings
+
     def save_metric_detector_mapping(self, detector_uuid, metric):
         """
         Detectors can't be managed without looking up by a metric, so the only way to
@@ -74,6 +85,18 @@ class DetectorClient:
             timeout=30
         )
         create_metric_detector_mapping.raise_for_status()
+
+    def delete_metric_detector_mapping(self, detector_mapping_id):
+        """
+        Detectors can't be managed without looking up by a metric, so the only way to
+        create a detector is to lookup the metric first and see that it doesn't exist.
+        If a detector already exists for metric, DetectorBuilderError is raised.
+        """
+        response = requests.delete(
+            f"{self._url}/api/detectorMappings?id={detector_mapping_id}",
+            timeout=30
+        )
+        response.raise_for_status()
 
     def create_detector(self, detector):
         """
@@ -112,12 +135,12 @@ class DetectorClient:
         response.raise_for_status()
         return self.get_detector(detector.uuid)
 
-    def delete_detector(self, detector):
+    def delete_detector(self, detector_uuid):
         """
 
         """
         response = requests.delete(
-            f"{self._url}/api/v2/detectors?uuid={detector.uuid}", timeout=30
+            f"{self._url}/api/v2/detectors?uuid={detector_uuid}", timeout=30
         )
         response.raise_for_status()
 

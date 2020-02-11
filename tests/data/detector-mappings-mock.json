@@ -1,0 +1,65 @@
+[
+    {
+      "id": "5XeANXABlK1-eG-Fo78V",
+      "detector": {
+        "uuid": "4fdc3395-e969-449a-a306-201db183c6d7"
+      },
+      "expression": {
+        "operator": "AND",
+        "operands": [
+          {
+            "field": {
+              "key": "app",
+              "value": "my-web-app"
+            },
+            "expression": null
+          },
+          {
+            "field": {
+              "key": "what",
+              "value": "elb_5xx"
+            },
+            "expression": null
+          }
+        ]
+      },
+      "user": {
+        "id": "cron-job"
+      },
+      "lastModifiedTimeInMillis": 1581445587731,
+      "createdTimeInMillis": 1581445587731,
+      "searchIndexes": null,
+      "enabled": true
+    },{
+      "id": "6XeANXABlK1-eG-Fo78V",
+      "detector": {
+        "uuid": "47a0661d-aceb-4ef2-bf06-0828f28631b4"
+      },
+      "expression": {
+        "operator": "AND",
+        "operands": [
+          {
+            "field": {
+              "key": "app",
+              "value": "my-web-app"
+            },
+            "expression": null
+          },
+          {
+            "field": {
+              "key": "what",
+              "value": "elb_5xx"
+            },
+            "expression": null
+          }
+        ]
+      },
+      "user": {
+        "id": "cron-job"
+      },
+      "lastModifiedTimeInMillis": 1581445587731,
+      "createdTimeInMillis": 1581445587731,
+      "searchIndexes": null,
+      "enabled": true
+    }
+  ]

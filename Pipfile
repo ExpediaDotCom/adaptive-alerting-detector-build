@@ -12,6 +12,7 @@ seaborn = "*"
 related = "*"
 docopt = "*"
 requests = "*"
+dataclasses = "*"
 
 [dev-packages]
 pytest = "*"
@@ -22,6 +23,7 @@ adaptive-alerting-detector-build = {editable = true,path = "."}
 responses = "*"
 pytest-env = "*"
 pipenv = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.7"

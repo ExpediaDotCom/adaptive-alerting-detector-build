@@ -66,15 +66,27 @@ class Metric:
                 new_detectors.append(new_detector)
         return new_detectors
 
+    def delete_detectors(self):
+        """
+        Deletes all detectors and mappings for the metric.
+        """
+        deleted_detectors = []
+        for detector in self.detectors:
+            detector_mappings = self._detector_client.list_detector_mappings(detector.uuid)
+            for detector_mapping in detector_mappings:
+                self._detector_client.delete_metric_detector_mapping(detector_mapping.id)
+            self._detector_client.delete_detector(detector.uuid)
+            deleted_detectors.append(detector)
+        return deleted_detectors
 
     def select_detectors(self):
         """
         TODO: Use metric profile data to determine which detectors to use
         """
         constant_threshold_detector = dict(
-            type = "constant-detector",
-            config = dict(
-                hyperparameters =dict(
+            type="constant-detector",
+            config=dict(
+                hyperparameters=dict(
                     strategy="sigma", weak_multiplier=3.0, strong_multiplier=4.0
                 )
             )
@@ -92,9 +104,3 @@ class Metric:
         if not self._profile:
             self._profile = build_profile(self.sample_data)
         return self._profile
-
-
-"""
-train interval will be dependent on profile attributes
-no data - don't build a detector now
-"""

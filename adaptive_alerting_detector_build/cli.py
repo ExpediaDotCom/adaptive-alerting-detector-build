@@ -84,8 +84,23 @@ def build_detectors_for_metric_configs(metric_configs):
 def train_detectors_for_metric_configs(metric_configs):
     exit_code = 0
     return exit_code
-        
-        
+
+def delete_detectors_for_metric_configs(metric_configs):
+    exit_code = 0
+    for metric_config in metric_configs:
+        metric = Metric(related.to_dict(metric_config), metric_config.datasource)
+        try:
+            deleted_detectors = metric.delete_detectors()
+            for detector in deleted_detectors:
+                logging.info(f"Detector/Detector Mapping with UUID '{detector.uuid}' deleted.")
+            if not deleted_detectors:
+                logging.info(f"No detectors to delete for metric '{metric_config.name}'")
+        except Exception as e:
+            logging.exception(f"Exception {e.__class__.__name__} while deleting detectors for metric {metric_config.name}! Skipping!")
+            trace = traceback.format_exc()
+            logging.debug(f"Traceback: {trace}")
+            exit_code = 1
+    return exit_code
 
 def console_script_entrypoint():
     logging.basicConfig(level=logging.INFO)
@@ -93,8 +108,13 @@ def console_script_entrypoint():
     exit_code = 0
 
     if args["delete"]:
-        logging.info("'delete' is not yet implemented.")
-        exit_code = 2
+        for json_config_file in args["<json_config_file>"]:
+            logging.info("")
+            metric_configs, exit_code = read_config_file(json_config_file)
+            build_exit_code = build_detectors_for_metric_configs(metric_configs)
+            if build_exit_code > exit_code:
+                exit_code = build_exit_code
+            logging.info("Done")
 
     elif args["build"]:
         for json_config_file in args["<json_config_file>"]:

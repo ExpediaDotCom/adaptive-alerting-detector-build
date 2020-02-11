@@ -5,7 +5,10 @@ import pandas as pd
 import pytest
 import responses
 import json
-from tests.conftest import FIND_BY_MATCHING_TAGS_MOCK_RESPONSE, FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE, MOCK_DETECTORS
+from tests.conftest import FIND_BY_MATCHING_TAGS_MOCK_RESPONSE
+from tests.conftest import FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE
+from tests.conftest import MOCK_DETECTORS
+from tests.conftest import DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE
 
 
 @responses.activate
@@ -55,6 +58,40 @@ def test_build_metric_detectors(mock_metric):
     # test_metric_detector.save()
     # assert test_metric_detector.state=="TRUSTED"
 
+
+@responses.activate
+def test_delete_metric_detectors(mock_metric):
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
+            json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
+            status=200)
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+            json=MOCK_DETECTORS[0],
+            status=200)
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+            json=MOCK_DETECTORS[1],
+            status=200)
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
+            json=[DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE[0]],
+            status=200)
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
+            json=[DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE[1]],
+            status=200)
+    responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=5XeANXABlK1-eG-Fo78V",
+            status=200)
+    responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=6XeANXABlK1-eG-Fo78V",
+            status=200)
+    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+            status=200)
+    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+            status=200)
+    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
+    assert len(test_metric.detectors) == 2
+    test_metric.delete_detectors()
+    responses.reset()
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
+        json=FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE,
+        status=200)
+    assert len(test_metric.detectors) == 0
 
 
 @responses.activate
