@@ -89,7 +89,7 @@ def train_detectors_for_metric_configs(metric_configs):
 
 def console_script_entrypoint():
     logging.basicConfig(level=logging.INFO)
-    args = docopt(__doc__, __version__)
+    args = docopt(__doc__, version=__version__)
     exit_code = 0
 
     if args["delete"]:
