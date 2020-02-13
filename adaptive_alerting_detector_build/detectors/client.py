@@ -7,9 +7,15 @@ import related
 from .factory import build_detector
 from .exceptions import DetectorBuilderError
 
-from adaptive_alerting_detector_build.config import MODEL_SERVICE_URL, MODEL_SERVICE_USER
-from adaptive_alerting_detector_build.detectors import Detector, DetectorUUID, get_detector_class
-from adaptive_alerting_detector_build.detectors.mapping import DetectorMapping, build_metric_detector_mapping
+from adaptive_alerting_detector_build.config import (
+    MODEL_SERVICE_URL,
+    MODEL_SERVICE_USER,
+)
+from adaptive_alerting_detector_build import detectors
+from adaptive_alerting_detector_build.detectors.mapping import (
+    DetectorMapping,
+    build_metric_detector_mapping,
+)
 
 
 LOGGER = logging.getLogger(__name__)
@@ -45,9 +51,7 @@ class DetectorClient:
             f"{self._url}/api/v2/detectors/findByUuid?uuid={detector_uuid}"
         )
         response.raise_for_status()
-        detector = related.from_json(response.text, Detector)
-        detector_class = get_detector_class(detector.type)
-        return related.from_json(response.text, detector_class)
+        return detectors.from_json(response.text)
 
     def list_detectors_for_metric(self, metric_tags):
         response = requests.post(
@@ -106,8 +110,15 @@ class DetectorClient:
         * If values for 'detector_config', 'enabled', or 'trusted' are not passed, the
           current value is used.
         """
+        update_request = related.to_dict(detector)
+        del update_request["training_interval"]
+        del update_request["lastUpdateTimestamp"]
+        del update_request["createdBy"]
+        del update_request["meta"]
         response = requests.put(
-            f"{self._url}/api/v2/detectors?uuid={detector.uuid}", json=related.to_dict(detector), timeout=30
+            f"{self._url}/api/v2/detectors?uuid={detector.uuid}",
+            json=update_request,
+            timeout=30,
         )
         response.raise_for_status()
         return self.get_detector(detector.uuid)

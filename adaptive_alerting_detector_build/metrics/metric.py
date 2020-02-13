@@ -1,3 +1,4 @@
+import datetime
 from enum import unique, Enum
 import related
 import requests
@@ -72,14 +73,30 @@ class Metric:
         TODO: Use metric profile data to determine which detectors to use
         """
         constant_threshold_detector = dict(
-            type = "constant-detector",
-            config = dict(
-                hyperparameters =dict(
-                    strategy="sigma", weak_multiplier=3.0, strong_multiplier=4.0
+            type="constant-detector",
+            config=dict(
+                hyperparams=dict(
+                    strategy="sigma", 
+                    lower_weak_multiplier=3.0, 
+                    lower_strong_multiplier=4.0,
+                    upper_weak_multiplier=3.0, 
+                    upper_strong_multiplier=4.0
                 )
             )
         )
         return [constant_threshold_detector]
+
+    def train_detectors(self):
+        """
+        Deletes all detectors and mappings for the metric.
+        """
+        updated_detectors = []
+        for detector in self.detectors:
+            if detector.needs_training:
+                detector.train(data=self.query())
+                updated_detector = self._detector_client.update_detector(detector)
+                updated_detectors.append(updated_detector)
+        return updated_detectors
 
     @property
     def sample_data(self):

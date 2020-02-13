@@ -3,9 +3,14 @@ from adaptive_alerting_detector_build.config import MODEL_SERVICE_URL
 from adaptive_alerting_detector_build.detectors import Detector, DetectorClient
 import pandas as pd
 import pytest
+from freezegun import freeze_time
 import responses
 import json
-from tests.conftest import FIND_BY_MATCHING_TAGS_MOCK_RESPONSE, FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE, MOCK_DETECTORS
+from math import isclose
+from tests.conftest import FIND_BY_MATCHING_TAGS_MOCK_RESPONSE
+from tests.conftest import FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE
+from tests.conftest import MOCK_DETECTORS
+from tests.conftest import DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE
 
 
 @responses.activate
@@ -55,6 +60,34 @@ def test_build_metric_detectors(mock_metric):
     # test_metric_detector.save()
     # assert test_metric_detector.state=="TRUSTED"
 
+
+
+@responses.activate
+@freeze_time("2019-11-15")
+def test_train_metric_detectors(mock_metric):
+    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
+            json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
+            status=200)
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+            json=MOCK_DETECTORS[0],
+            status=200)
+    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+            json=MOCK_DETECTORS[1],
+            status=200)
+    def validate_update_request(request):
+        payload = json.loads(request.body)
+        thresholds = payload["detectorConfig"]["params"]["thresholds"]
+        assert isclose(thresholds["upperWeak"], 21.19, rel_tol=0.01)
+        assert isclose(thresholds["upperStrong"], 26.30, rel_tol=0.01)
+        assert isclose(thresholds["lowerWeak"], -9.48, rel_tol=0.01)
+        assert isclose(thresholds["lowerStrong"], -14.59, rel_tol=0.01)
+        return (200, {}, None)
+    responses.add_callback(responses.PUT, "http://modelservice/api/v2/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+            callback=validate_update_request)
+    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
+    assert len(test_metric.detectors) == 2
+    trained_detectors = test_metric.train_detectors()
+    assert len(trained_detectors) == 1
 
 
 @responses.activate
