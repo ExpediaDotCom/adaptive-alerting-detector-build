@@ -6,6 +6,7 @@ JSON metrics configuration file.
 Usage:
     adaptive-alerting build <json_config_file>...
     adaptive-alerting delete <json_config_file>...
+    adaptive-alerting train <json_config_file>...
     adaptive-alerting -h | --help
 
 Commands:
@@ -87,6 +88,32 @@ def build_detectors_for_metric_configs(metric_configs):
 
 def train_detectors_for_metric_configs(metric_configs):
     exit_code = 0
+    for metric_config in metric_configs:
+        metric = Metric(related.to_dict(metric_config), metric_config.datasource)
+        try:
+            updated_detectors = []
+            for detector in metric.detectors:
+                if detector.needs_training:
+                    detector.train(data=metric.query())
+                    updated_detector = metric._detector_client.update_detector(detector)
+                    updated_detectors.append(updated_detector)
+                    logging.info(
+                        f"Trained '{detector.type}' detector with UUID: {detector.uuid}"
+                    )
+                else:
+                    logging.info(
+                        f"Training not required for '{detector.type}' detector with UUID: {detector.uuid}"
+                    )
+
+            if not updated_detectors:
+                logging.info(f"No detectors trained for metric '{metric_config.name}'")
+        except Exception as e:
+            logging.exception(
+                f"Exception {e.__class__.__name__} while training detector(s) for metric {metric_config.name}! Skipping!"
+            )
+            trace = traceback.format_exc()
+            logging.debug(f"Traceback: {trace}")
+            exit_code = 1
     return exit_code
 
 
@@ -123,9 +150,9 @@ def console_script_entrypoint():
         for json_config_file in args["<json_config_file>"]:
             logging.info("")
             metric_configs, exit_code = read_config_file(json_config_file)
-            build_exit_code = build_detectors_for_metric_configs(metric_configs)
-            if build_exit_code > exit_code:
-                exit_code = build_exit_code
+            delete_exit_code = delete_detectors_for_metric_configs(metric_configs)
+            if delete_exit_code > exit_code:
+                exit_code = delete_exit_code
             logging.info("Done")
 
     elif args["build"]:
@@ -141,6 +168,8 @@ def console_script_entrypoint():
         for json_config_file in args["<json_config_file>"]:
             logging.info("")
             metric_configs, exit_code = read_config_file(json_config_file)
+            train_exit_code = train_detectors_for_metric_configs(metric_configs)
+            if train_exit_code > exit_code:
+                exit_code = train_exit_code
             logging.info("Done")
-
     sys.exit(exit_code)

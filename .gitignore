@@ -10,3 +10,9 @@ build/
 .coverage
 .DS_Store
 .env
+
+# IDE-specific
+*.iml
+.idea/
+*.ipr
+*.iws

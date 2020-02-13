@@ -1,9 +1,8 @@
 from adaptive_alerting_detector_build.metrics import Metric
 from adaptive_alerting_detector_build.config import MODEL_SERVICE_URL
 from adaptive_alerting_detector_build.detectors import Detector
-from adaptive_alerting_detector_build.detectors.client import DetectorClient, DetectorUUID
+from adaptive_alerting_detector_build.detectors.client import DetectorClient
 from adaptive_alerting_detector_build.detectors.mapping import DetectorMapping
-
 import pandas as pd
 import pytest
 import related

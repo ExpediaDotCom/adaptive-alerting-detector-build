@@ -12,7 +12,7 @@ seaborn = "*"
 related = "*"
 docopt = "*"
 requests = "*"
-dataclasses = "*"
+dataclasses = {version = "*",markers = "python_version<'3.7'"}
 
 [dev-packages]
 pytest = "*"
@@ -24,6 +24,7 @@ responses = "*"
 pytest-env = "*"
 pipenv = "*"
 flake8 = "*"
+freezegun = "*"
 
 [requires]
 python_version = "3.7"
