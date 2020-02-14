@@ -104,9 +104,6 @@ def train_detectors_for_metric_configs(metric_configs):
                     logging.info(
                         f"Training not required for '{detector.type}' detector with UUID: {detector.uuid}"
                     )
-
-            if not updated_detectors:
-                logging.info(f"No detectors trained for metric '{metric_config.name}'")
         except Exception as e:
             logging.exception(
                 f"Exception {e.__class__.__name__} while training detector(s) for metric {metric_config.name}! Skipping!"
