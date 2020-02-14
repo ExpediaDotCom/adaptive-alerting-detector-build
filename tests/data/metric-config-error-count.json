@@ -1,0 +1,11 @@
+[
+  {
+    "name": "My App Request Count",
+    "type": "REQUEST_COUNT",
+    "description": "Sum of requests received.",
+    "tags": {
+      "app": "my-web-app",
+      "what": "elb_2xx"
+    }
+  }
+]

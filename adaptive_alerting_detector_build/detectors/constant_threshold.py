@@ -14,8 +14,6 @@ import numpy as np
 # from adaptive_alerting_detector_build.detectors import exceptions
 from . import Detector
 from .exceptions import DetectorBuilderError
-from adaptive_alerting_detector_build.utils.attrs import validate
-
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
@@ -24,29 +22,35 @@ LOGGER = logging.getLogger(__name__)
 @unique
 class ConstantThresholdStrategy(Enum):
     """Constant threshold model fitting strategies"""
+
     SIGMA = "sigma"
     QUARTILE = "quartile"
+
 
 @unique
 class ConstantThresholdType(Enum):
     """Constant threshold model type"""
-    RIGHT = "RIGHT_TAILED" 
-    LEFT = "LEFT_TAILED" 
+
+    RIGHT = "RIGHT_TAILED"
+    LEFT = "LEFT_TAILED"
     TWO = "TWO_TAILED"
 
 
 @related.mutable
 class ConstantThresholdHyperparameters:
     strategy = related.ChildField(ConstantThresholdStrategy)
-    weak_multiplier = related.FloatField(default=1.0)
-    strong_multiplier = related.FloatField(default=1.0)
+    lower_weak_multiplier = related.FloatField(default=4.0, required=False)
+    lower_strong_multiplier = related.FloatField(default=5.0, required=False)
+    upper_weak_multiplier = related.FloatField(default=4.0, required=False)
+    upper_strong_multiplier = related.FloatField(default=5.0, required=False)
+
 
 @related.mutable
 class ConstantThresholdThresholds:
-    weak_upper_threshold = related.FloatField(key='upperWeak') 
-    strong_upper_threshold = related.FloatField(key='upperStrong')
-    weak_lower_threshold = related.FloatField(key='lowerWeak')
-    strong_lower_threshold = related.FloatField(key='lowerStrong')
+    weak_upper_threshold = related.FloatField(key="upperWeak", required=False)
+    strong_upper_threshold = related.FloatField(key="upperStrong", required=False)
+    weak_lower_threshold = related.FloatField(key="lowerWeak", required=False)
+    strong_lower_threshold = related.FloatField(key="lowerStrong", required=False)
 
 
 @related.mutable
@@ -54,11 +58,11 @@ class ConstantThresholdParams:
     type = related.ChildField(ConstantThresholdType)
     thresholds = related.ChildField(ConstantThresholdThresholds)
 
+
 @related.mutable
 class ConstantThresholdConfig:
-    hyperparameters = related.ChildField(ConstantThresholdHyperparameters)
+    hyperparams = related.ChildField(ConstantThresholdHyperparameters)
     params = related.ChildField(ConstantThresholdParams, required=False)
-
 
 class ConstantThresholdDetector(Detector):
     """Constant Threshold Detectors Builder class.
@@ -70,10 +74,10 @@ class ConstantThresholdDetector(Detector):
         - sigma
         - quartile
     """
+
     id = "constant-detector"
     config_class = ConstantThresholdConfig
-    
-
+    training_interval = "7d"
     # """
 
     # Calculations are performed on the provided data using the specified strategy, to determine
@@ -93,12 +97,11 @@ class ConstantThresholdDetector(Detector):
     # """
     # return constant_threshold_config(**detector_config)
 
-
     def train(self, data):
         """
         """
         data_drop_nan = data.dropna(axis=0, how="any", inplace=False)
-        strategy = self.config.hyperparameters.strategy
+        strategy = self.config.hyperparams.strategy
         if strategy == ConstantThresholdStrategy.SIGMA:
             self._train_sigma(data_drop_nan)
         elif strategy == ConstantThresholdStrategy.QUARTILE:
@@ -120,57 +123,46 @@ class ConstantThresholdDetector(Detector):
 
         sigma = _calculate_sigma(sample)
         mean = _calculate_mean(sample)
-        weak_upper_threshold, weak_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.hyperparameters.weak_multiplier
-        )
-        strong_upper_threshold, strong_lower_threshold = _calculate_sigma_thresholds(
-            sigma, mean, self.config.hyperparameters.strong_multiplier
-        )
+        weak_lower_threshold = mean - sigma * self.config.hyperparams.lower_weak_multiplier
+        strong_lower_threshold = mean - sigma * self.config.hyperparams.lower_strong_multiplier
+        weak_upper_threshold = mean + sigma * self.config.hyperparams.upper_weak_multiplier
+        strong_upper_threshold = mean + sigma * self.config.hyperparams.upper_strong_multiplier
 
         self.config.params = ConstantThresholdParams(
-            type = ConstantThresholdType.TWO, #TODO: Default to TWO for now. To be determined by Profiler.
-            thresholds = ConstantThresholdThresholds(
-                            weak_upper_threshold=weak_upper_threshold,
-                            strong_upper_threshold=strong_upper_threshold,
-                            weak_lower_threshold=weak_lower_threshold,
-                            strong_lower_threshold=strong_lower_threshold
-            )
+            type=ConstantThresholdType.TWO,  # TODO: Default to TWO for now. To be determined by Profiler.
+            thresholds=ConstantThresholdThresholds(
+                weak_upper_threshold=weak_upper_threshold,
+                strong_upper_threshold=strong_upper_threshold,
+                weak_lower_threshold=weak_lower_threshold,
+                strong_lower_threshold=strong_lower_threshold,
+            ),
         )
-        
 
     def _train_quartile(self, sample):
-        """Performs threshold calculations using quartile strategy.
-
+        """Performs threshold calculations based on the interquartile range. 
+            (https://en.wikipedia.org/wiki/Interquartile_range)
         Parameters:
             sample: list of number data on which calculations are performed
-            weak_multiplier: number that represents to multiplier to use to calculate weak
-                             thresholds
-            strong_multiplier: number that represents to multiplier to use to calculate strong
-                               thresholds
 
         Returns:
             Detector object
        """
         q1, median, q3 = _calculate_quartiles(sample)
-        weak_upper_threshold, weak_lower_threshold = _calculate_quartile_thresholds(
-            q1, q3, self.config.hyperparameters.weak_multiplier
-        )
-        strong_upper_threshold, strong_lower_threshold = _calculate_quartile_thresholds(
-            q1, q3, self.config.hyperparameters.strong_multiplier
-        )
+        iqr = q3 - q1
+        weak_lower_threshold = q1 - (q3 - q1) * self.config.hyperparams.lower_weak_multiplier
+        strong_lower_threshold = q1 - (q3 - q1) * self.config.hyperparams.lower_strong_multiplier
+        weak_upper_threshold = q3 + (q3 - q1) * self.config.hyperparams.upper_weak_multiplier
+        strong_upper_threshold = q3 + (q3 - q1) * self.config.hyperparams.upper_strong_multiplier
 
         self.config.params = ConstantThresholdParams(
-            type = ConstantThresholdType.TWO, 
-            thresholds = ConstantThresholdThresholds(
-                            weak_upper_threshold=weak_upper_threshold,
-                            strong_upper_threshold=strong_upper_threshold,
-                            weak_lower_threshold=weak_lower_threshold,
-                            strong_lower_threshold=strong_lower_threshold
-            )
+            type=ConstantThresholdType.TWO,
+            thresholds=ConstantThresholdThresholds(
+                weak_upper_threshold=weak_upper_threshold,
+                strong_upper_threshold=strong_upper_threshold,
+                weak_lower_threshold=weak_lower_threshold,
+                strong_lower_threshold=strong_lower_threshold,
+            ),
         )
-        
-
-
 
 
 def _calculate_sigma(sample):
@@ -196,23 +188,6 @@ def _calculate_mean(sample):
     return np.mean(array)
 
 
-def _calculate_sigma_thresholds(sigma, mean, multiplier):
-    """Calculates and returns the thresholds using sigmas.
-
-    Parameters:
-        sigma: standard deviation value
-        mean: mean of the provided sample
-        multiplier: number by which to multiply the sigma to add/subtract from the mean
-
-    Returns:
-        a list containing the upper and lower threshold values
-    """
-
-    upper = mean + sigma * multiplier
-    lower = mean - sigma * multiplier
-    return upper, lower
-
-
 def _calculate_quartiles(sample):
     """Calculates and returns quartiles for the provided sample.
 
@@ -230,20 +205,5 @@ def _calculate_quartiles(sample):
     return np.percentile(array, [25, 50, 75], interpolation="midpoint")
 
 
-def _calculate_quartile_thresholds(q1, q3, multiplier):
-    """Calculates and returns the thresholds using quartiles.
 
-    Parameters:
-        q1: first quartile value
-        q3: third quartile value
-        multiplier: number by which to multiply the inter-quartile-range to add/subtract from the
-                    quartiles
 
-    Returns:
-        a list containing the upper and lower threshold values
-    """
-
-    iqr = q3 - q1
-    upper = q3 + iqr * multiplier
-    lower = q1 - iqr * multiplier
-    return upper, lower

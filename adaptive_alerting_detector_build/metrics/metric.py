@@ -1,3 +1,4 @@
+import datetime
 from enum import unique, Enum
 import related
 import requests
@@ -21,15 +22,20 @@ class MetricConfig:
     type = related.ChildField(MetricType)
     tags = related.ChildField(dict)
     description = related.StringField(required=False)
-    datasource = related.ChildField(dict, default=get_datasource_config(), required=False)
+    datasource = related.ChildField(
+        dict, default=get_datasource_config(), required=False
+    )
 
 
 class Metric:
-
-    def __init__(self, config, datasource_config, model_service_url=None, model_service_user=None):
+    def __init__(
+        self, config, datasource_config, model_service_url=None, model_service_user=None
+    ):
         self.config = config
         self._datasource = datasource(datasource_config)
-        self._detector_client = DetectorClient(model_service_url=model_service_url, model_service_user=model_service_user)
+        self._detector_client = DetectorClient(
+            model_service_url=model_service_url, model_service_user=model_service_user
+        )
         self._sample_data = None
         self._profile = None
 
@@ -59,27 +65,59 @@ class Metric:
             if selected_detector["type"] not in existing_detector_types:
                 detector = build_detector(**selected_detector)
                 detector.train(data=self.query())
-                new_detector = self._detector_client.create_detector(
-                    detector)
+                new_detector = self._detector_client.create_detector(detector)
                 self._detector_client.save_metric_detector_mapping(
-                    new_detector.uuid, self)
+                    new_detector.uuid, self
+                )
                 new_detectors.append(new_detector)
         return new_detectors
 
+    def delete_detectors(self):
+        """
+        Deletes all detectors and mappings for the metric.
+        """
+        deleted_detectors = []
+        for detector in self.detectors:
+            detector_mappings = self._detector_client.list_detector_mappings(
+                detector.uuid
+            )
+            for detector_mapping in detector_mappings:
+                self._detector_client.delete_metric_detector_mapping(
+                    detector_mapping.id
+                )
+            self._detector_client.delete_detector(detector.uuid)
+            deleted_detectors.append(detector)
+        return deleted_detectors
 
     def select_detectors(self):
         """
         TODO: Use metric profile data to determine which detectors to use
         """
         constant_threshold_detector = dict(
-            type = "constant-detector",
-            config = dict(
-                hyperparameters =dict(
-                    strategy="sigma", weak_multiplier=3.0, strong_multiplier=4.0
+            type="constant-detector",
+            config=dict(
+                hyperparams=dict(
+                    strategy="sigma", 
+                    lower_weak_multiplier=3.0, 
+                    lower_strong_multiplier=4.0,
+                    upper_weak_multiplier=3.0, 
+                    upper_strong_multiplier=4.0
                 )
-            )
+            ),
         )
         return [constant_threshold_detector]
+
+    def train_detectors(self):
+        """
+        Deletes all detectors and mappings for the metric.
+        """
+        updated_detectors = []
+        for detector in self.detectors:
+            if detector.needs_training:
+                detector.train(data=self.query())
+                updated_detector = self._detector_client.update_detector(detector)
+                updated_detectors.append(updated_detector)
+        return updated_detectors
 
     @property
     def sample_data(self):
@@ -92,9 +130,3 @@ class Metric:
         if not self._profile:
             self._profile = build_profile(self.sample_data)
         return self._profile
-
-
-"""
-train interval will be dependent on profile attributes
-no data - don't build a detector now
-"""
