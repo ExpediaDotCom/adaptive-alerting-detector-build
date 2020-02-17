@@ -46,7 +46,8 @@ class DetectorClient:
 
     def get_detector(self, detector_uuid):
         response = requests.get(
-            f"{self._url}/api/v2/detectors/findByUuid?uuid={detector_uuid}"
+            f"{self._url}/api/v2/detectors/findByUuid?uuid={detector_uuid}",
+            timeout=30
         )
         response.raise_for_status()
         return detectors.from_json(response.text)
@@ -61,14 +62,20 @@ class DetectorClient:
             "groupedDetectorsBySearchIndex"
         ]
         if grouped_detectors_by_search_index:
-            for detector in grouped_detectors_by_search_index["0"]:
-                detectors.append(self.get_detector(detector["uuid"]))
+            for detector_item in grouped_detectors_by_search_index["0"]:
+                try:
+                    detector_uuid = detector_item["uuid"]
+                    detector = self.get_detector(detector_uuid)
+                    detectors.append(detector)
+                except requests.exceptions.RequestException:
+                    LOGGER.warn(f"Metric mapped to detector UUID '{detector_uuid}', but the detector does not exist.")
         return detectors
 
     def list_detector_mappings(self, detector_uuid):
         response = requests.post(
             f"{self._url}/api/detectorMappings/search",
             json={"detectorUuid": detector_uuid},
+            timeout=30
         )
         response.raise_for_status()
         detector_mappings = list()
@@ -109,6 +116,7 @@ class DetectorClient:
         create a detector is to lookup the metric first and see that it doesn't exist.
         If a detector already exists for metric, DetectorBuilderError is raised.
         """
+        detector.created_by = self._user
         create_detector_request = related.to_dict(detector, suppress_empty_values=True)
         create_detector_response = requests.post(
             f"{self._url}/api/v2/detectors", json=create_detector_request, timeout=30
