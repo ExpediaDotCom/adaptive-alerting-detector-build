@@ -58,11 +58,20 @@ class ConstantThresholdParams:
     type = related.ChildField(ConstantThresholdType)
     thresholds = related.ChildField(ConstantThresholdThresholds)
 
+@related.mutable
+class ConstantThresholdTrainingMetaData:
+    training_interval = related.StringField(default="7d", key="trainingInterval")
 
 @related.mutable
 class ConstantThresholdConfig:
     hyperparams = related.ChildField(ConstantThresholdHyperparameters)
+    training_meta_data = related.ChildField(
+        ConstantThresholdTrainingMetaData, 
+        key="trainingMetaData",
+        default=ConstantThresholdTrainingMetaData()
+    )
     params = related.ChildField(ConstantThresholdParams, required=False)
+    
 
 class ConstantThresholdDetector(Detector):
     """Constant Threshold Detectors Builder class.
@@ -77,7 +86,6 @@ class ConstantThresholdDetector(Detector):
 
     id = "constant-detector"
     config_class = ConstantThresholdConfig
-    training_interval = "7d"
     # """
 
     # Calculations are performed on the provided data using the specified strategy, to determine
