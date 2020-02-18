@@ -28,7 +28,9 @@
             "upperStrong": 22
           }
         },
-        "trainingMetaData": {}
+        "trainingMetaData": {
+          "trainingInterval": "7d"
+        }
       }
     },
     {
@@ -60,7 +62,9 @@
             "upperStrong": 210
           }
         },
-        "trainingMetaData": {}
+        "trainingMetaData": {
+          "trainingInterval": "7d"
+        }
       }
     },
     {
@@ -92,7 +96,9 @@
             "upperStrong": 210
           }
         },
-        "trainingMetaData": {}
+        "trainingMetaData": {
+          "trainingInterval": "7d"
+        }
       }
     }
 ]

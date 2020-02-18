@@ -29,7 +29,7 @@ def build_detector(type, config, enabled=True, trusted=False,
     if not detector_class:
         raise DetectorBuilderError(f"Unknown detector type '{type}'")
     detector_config = related.to_model(detector_class.config_class, config)
-    training_interval = getattr(detector_class, "training_interval", None)
+    training_interval = getattr(detector_config.training_meta_data, "training_interval", "0")
     return detector_class(
         type=type, 
         config=detector_config, 
