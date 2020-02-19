@@ -64,7 +64,7 @@ class Metric:
         for selected_detector in _selected_detectors:
             if selected_detector["type"] not in existing_detector_types:
                 detector = build_detector(**selected_detector)
-                detector.train(data=self.query())
+                detector.train(data=self.query(), metric_type=self.config["type"])
                 new_detector = self._detector_client.create_detector(detector)
                 self._detector_client.save_metric_detector_mapping(
                     new_detector.uuid, self
@@ -109,12 +109,12 @@ class Metric:
 
     def train_detectors(self):
         """
-        Deletes all detectors and mappings for the metric.
+        Trains all detectors for the metric, if needed.
         """
         updated_detectors = []
         for detector in self.detectors:
             if detector.needs_training:
-                detector.train(data=self.query())
+                detector.train(data=self.query(), metric_type=self.config["type"])
                 updated_detector = self._detector_client.update_detector(detector)
                 updated_detectors.append(updated_detector)
         return updated_detectors

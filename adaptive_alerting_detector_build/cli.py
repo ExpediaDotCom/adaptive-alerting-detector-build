@@ -94,7 +94,7 @@ def train_detectors_for_metric_configs(metric_configs):
             updated_detectors = []
             for detector in metric.detectors:
                 if detector.needs_training:
-                    detector.train(data=metric.query())
+                    detector.train(data=metric.query(), metric_type=metric.config["type"])
                     updated_detector = metric._detector_client.update_detector(detector)
                     updated_detectors.append(updated_detector)
                     logging.info(
