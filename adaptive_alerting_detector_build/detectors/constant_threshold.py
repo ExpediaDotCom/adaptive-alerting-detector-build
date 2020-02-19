@@ -58,20 +58,22 @@ class ConstantThresholdParams:
     type = related.ChildField(ConstantThresholdType)
     thresholds = related.ChildField(ConstantThresholdThresholds)
 
+
 @related.mutable
 class ConstantThresholdTrainingMetaData:
     training_interval = related.StringField(default="7d", key="trainingInterval")
+
 
 @related.mutable
 class ConstantThresholdConfig:
     hyperparams = related.ChildField(ConstantThresholdHyperparameters)
     training_meta_data = related.ChildField(
-        ConstantThresholdTrainingMetaData, 
+        ConstantThresholdTrainingMetaData,
         key="trainingMetaData",
-        default=ConstantThresholdTrainingMetaData()
+        default=ConstantThresholdTrainingMetaData(),
     )
     params = related.ChildField(ConstantThresholdParams, required=False)
-    
+
 
 class ConstantThresholdDetector(Detector):
     """Constant Threshold Detectors Builder class.
@@ -105,17 +107,22 @@ class ConstantThresholdDetector(Detector):
     # """
     # return constant_threshold_config(**detector_config)
 
-    def train(self, data):
+    def train(self, data, metric_type):
         """
         """
         data_drop_nan = data.dropna(axis=0, how="any", inplace=False)
         strategy = self.config.hyperparams.strategy
-        if strategy == ConstantThresholdStrategy.SIGMA:
-            self._train_sigma(data_drop_nan)
-        elif strategy == ConstantThresholdStrategy.QUARTILE:
-            self._train_quartile(data_drop_nan)
 
-    def _train_sigma(self, sample):
+        threshold_type = _threshold_type(metric_type)
+        if not threshold_type:
+            raise DetectorBuilderError("Unknown metric_type")
+
+        if strategy == ConstantThresholdStrategy.SIGMA:
+            self._train_sigma(data_drop_nan, threshold_type)
+        elif strategy == ConstantThresholdStrategy.QUARTILE:
+            self._train_quartile(data_drop_nan, threshold_type)
+
+    def _train_sigma(self, sample, threshold_type):
         """Performs threshold calculations using sigma (standard deviation) strategy.
 
         Parameters:
@@ -137,7 +144,7 @@ class ConstantThresholdDetector(Detector):
         strong_upper_threshold = mean + sigma * self.config.hyperparams.upper_strong_multiplier
 
         self.config.params = ConstantThresholdParams(
-            type=ConstantThresholdType.TWO,  # TODO: Default to TWO for now. To be determined by Profiler.
+            type=threshold_type,
             thresholds=ConstantThresholdThresholds(
                 weak_upper_threshold=weak_upper_threshold,
                 strong_upper_threshold=strong_upper_threshold,
@@ -146,7 +153,7 @@ class ConstantThresholdDetector(Detector):
             ),
         )
 
-    def _train_quartile(self, sample):
+    def _train_quartile(self, sample, threshold_type):
         """Performs threshold calculations based on the interquartile range. 
             (https://en.wikipedia.org/wiki/Interquartile_range)
         Parameters:
@@ -163,7 +170,7 @@ class ConstantThresholdDetector(Detector):
         strong_upper_threshold = q3 + (q3 - q1) * self.config.hyperparams.upper_strong_multiplier
 
         self.config.params = ConstantThresholdParams(
-            type=ConstantThresholdType.TWO,
+            type=threshold_type,
             thresholds=ConstantThresholdThresholds(
                 weak_upper_threshold=weak_upper_threshold,
                 strong_upper_threshold=strong_upper_threshold,
@@ -171,6 +178,16 @@ class ConstantThresholdDetector(Detector):
                 strong_lower_threshold=strong_lower_threshold,
             ),
         )
+
+
+def _threshold_type(metric_type):
+    mappings = {
+        "REQUEST_COUNT": ConstantThresholdType.TWO,
+        "ERROR_COUNT": ConstantThresholdType.RIGHT,
+        "SUCCESS_RATE": ConstantThresholdType.LEFT,
+        "LATENCY_AVG": ConstantThresholdType.RIGHT,
+    }
+    return mappings.get(metric_type, None)
 
 
 def _calculate_sigma(sample):
@@ -211,7 +228,3 @@ def _calculate_quartiles(sample):
 
     array = np.array(sample)
     return np.percentile(array, [25, 50, 75], interpolation="midpoint")
-
-
-
-

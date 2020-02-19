@@ -5,10 +5,14 @@ from re import search
 import pytest
 from adaptive_alerting_detector_build.detectors import build_detector
 from adaptive_alerting_detector_build.detectors.constant_threshold import (
-    ConstantThresholdStrategy, ConstantThresholdConfig
+    ConstantThresholdStrategy,
+    ConstantThresholdConfig,
+    ConstantThresholdType,
 )
-from adaptive_alerting_detector_build.detectors import exceptions, constant_threshold as ct
-from adaptive_alerting_detector_build.metrics import metric
+from adaptive_alerting_detector_build.detectors import (
+    exceptions,
+    constant_threshold as ct,
+)
 import responses
 import related
 import json
@@ -20,9 +24,11 @@ def test_calculate_sigma_for_integers():
     sample = [5, 4, 7, 9, 15, 1, 0]
     assert isclose(ct._calculate_sigma(sample), 5.1130086, rel_tol=0.0001)
 
+
 def test_calculate_sigma_for_floats():
     sample = [35.2, 42.9, 37.8, 9.3, 15.0, 10.1, 20]
     assert isclose(ct._calculate_sigma(sample), 14.015671, rel_tol=0.0001)
+
 
 def test_calculate_sigma_raises_error_for_single_value():
     sample = [35.2]
@@ -30,14 +36,17 @@ def test_calculate_sigma_raises_error_for_single_value():
         assert isclose(ct._calculate_sigma(sample), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
+
 def test_calculate_sigma_raises_error_with_empty_list():
     with pytest.raises(exceptions.DetectorBuilderError) as exception:
         assert isclose(ct._calculate_sigma([]), 0)
     assert str(exception.value) == "Sample must have at least two elements"
 
+
 def test_calculate_mean_for_floats():
     sample = [35.2, 42.9, 37.8, 9.3, 15.0, 10.1, 20]
     assert isclose(ct._calculate_mean(sample), 24.328571, rel_tol=0.0001)
+
 
 def test_calculate_mean_for_single_value():
     sample = [35.2]
@@ -51,12 +60,14 @@ def test_calculate_mean_for_single_value():
 #     assert upper == 25   # 10 + 5 * 3; mean + sigma * multiplier
 #     assert lower == -5   # 10 - 5 * 3; mean - sigma * multiplier
 
+
 def test_calculate_quartiles():
     sample = [2, 5, 6, 7, 10, 22, 13, 14, 16, 65, 45, 12]
     q1, median, q3 = ct._calculate_quartiles(sample)
     assert q1 == 6.5
     assert median == 12.5
     assert q3 == 19.0
+
 
 def test_calculate_quartiles_for_single_value():
     sample = [2]
@@ -65,12 +76,14 @@ def test_calculate_quartiles_for_single_value():
     assert median == 2
     assert q3 == 2
 
+
 # def test_calculate_quartile_thresholds():
 #     q1, q3 = 2, 5
 #     multiplier = 1.5
 #     upper, lower = ct._calculate_quartile_thresholds(q1, q3, multiplier)
 #     assert upper == 9.5 # (q3 + (q3 - q1) * 1.5)
 #     assert lower == -2.5 # (q1 - (q3 - q1) * 1.5)
+
 
 def test_load_constant_threshold_config():
     detector_config = dict(
@@ -81,22 +94,22 @@ def test_load_constant_threshold_config():
     constant_threshold_config = related.to_model(ConstantThresholdConfig, detector_config)
     assert isinstance(constant_threshold_config, ConstantThresholdConfig)
 
+
 def test_build_detector_with_sigma_strategy(mock_metric):
     detector_config = dict(
         hyperparams=dict(
-            strategy="sigma", 
-            upper_weak_multiplier=3.0, 
+            strategy="sigma",
+            upper_weak_multiplier=3.0,
             upper_strong_multiplier=5.0,
-            lower_weak_multiplier=3.0, 
-            lower_strong_multiplier=5.0
-        )
+            lower_weak_multiplier=3.0,
+            lower_strong_multiplier=5.0,
+        ),
     )
     test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
     test_detector = build_detector("constant-detector", detector_config)
     data = test_metric.query()
-    test_detector.train(data)
-    assert (
-        test_detector.config.hyperparams.strategy
+    test_detector.train(data, test_metric.config["type"])
+    assert (test_detector.config.hyperparams.strategy
         == ConstantThresholdStrategy.SIGMA
     )
     assert isclose(
@@ -120,34 +133,35 @@ def test_build_detector_with_sigma_strategy(mock_metric):
         rel_tol=0.0001,
     )
 
+
 def test_build_detector_with_quartile_strategy(mock_metric):
     detector_config = dict(
-        hyperparams =dict(
-            strategy="quartile", 
-            lower_weak_multiplier=1.5, 
+        hyperparams=dict(
+            strategy="quartile",
+            lower_weak_multiplier=1.5,
             lower_strong_multiplier=3.0,
-            upper_weak_multiplier=1.5, 
+            upper_weak_multiplier=1.5,
             upper_strong_multiplier=3.0,
-        )
+        ),
     )
     test_metric = mock_metric(data=[5, 4, 7, 9, 15, None, 1, 0])
     test_detector = build_detector("constant-detector", detector_config)
     data = test_metric.query()
-    test_detector.train(data)
+    test_detector.train(data, test_metric.config["type"])
     assert (
-        test_detector.config.hyperparams.strategy
-        == ConstantThresholdStrategy.QUARTILE
+        test_detector.config.hyperparams.strategy == ConstantThresholdStrategy.QUARTILE
     )
     assert test_detector.config.params.thresholds.weak_upper_threshold == 16.25
     assert test_detector.config.params.thresholds.strong_upper_threshold == 24.5
     assert test_detector.config.params.thresholds.weak_lower_threshold == -5.75
     assert test_detector.config.params.thresholds.strong_lower_threshold == -14
 
+
 def test_build_detector_with_invalid_strategy_raises_build_error(mock_metric):
     detector_config = dict(
-        hyperparams =dict(
+        hyperparams=dict(
             strategy="invalid strategy", weak_multiplier=1.5, strong_multiplier=3.0
-        )
+        ),
     )
     with pytest.raises(ValueError) as exception:
         build_detector("constant-detector", detector_config)
@@ -168,7 +182,42 @@ def test_train_detector_with_invalid_sample_size_raises_build_error(mock_metric)
     responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
+
+    detector_config = dict(
+        hyperparams=dict(strategy="sigma", weak_multiplier=3.0, strong_multiplier=5.0),
+    )
     test_metric = mock_metric(data=[3])
     with pytest.raises(exceptions.DetectorBuilderError) as exception:
-        test_metric.build_detectors()
+        test_detector = build_detector("constant-detector", detector_config)
+        data = test_metric.query()
+        test_detector.train(data, test_metric.config["type"])
     assert str(exception.value) == "Sample must have at least two elements"
+
+
+def test_tail_mappings(mock_metric):
+    _test_tail_mapping(mock_metric, "REQUEST_COUNT", ConstantThresholdType.TWO)
+    _test_tail_mapping(mock_metric, "SUCCESS_RATE", ConstantThresholdType.LEFT)
+    _test_tail_mapping(mock_metric, "ERROR_COUNT", ConstantThresholdType.RIGHT)
+
+
+def _test_tail_mapping(mock_metric, metric_type_val, tail_type):
+    detector_config = dict(
+        hyperparams=dict(strategy="sigma", weak_multiplier=3.0, strong_multiplier=5.0),
+    )
+    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0], metric_type=metric_type_val)
+    test_detector = build_detector("constant-detector", detector_config)
+    data = test_metric.query()
+    test_detector.train(data, test_metric.config["type"])
+    assert test_detector.config.params.type == tail_type
+
+
+def test_invalid_metric_type_raises_error(mock_metric):
+    detector_config = dict(
+        hyperparams=dict(strategy="sigma", weak_multiplier=3.0, strong_multiplier=5.0),
+    )
+    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0], metric_type="INVALID_TYPE")
+    test_detector = build_detector("constant-detector", detector_config)
+    data = test_metric.query()
+    with pytest.raises(exceptions.DetectorBuilderError) as exception:
+        test_detector.train(data, test_metric.config["type"])
+    assert str(exception.value) == "Unknown metric_type"
