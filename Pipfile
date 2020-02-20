@@ -6,13 +6,13 @@ verify_ssl = true
 [packages]
 matplotlib = "*"
 numpy = "*"
-pandas = "*"
 statsmodels = "*"
 seaborn = "*"
 related = "*"
 docopt = "*"
 requests = "*"
 dataclasses = {version = "*",markers = "python_version<'3.7'"}
+pandas = "==0.24.2"
 
 [dev-packages]
 pytest = "*"
