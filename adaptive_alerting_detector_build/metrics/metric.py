@@ -121,7 +121,7 @@ class Metric:
 
     @property
     def sample_data(self):
-        if not self._sample_data:
+        if self._sample_data is None:
             self._sample_data = self.query()
         return self._sample_data
 

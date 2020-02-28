@@ -22,10 +22,33 @@ def test_graphite_query():
 
 
 @responses.activate
+def test_graphite_query_with_function_tag():
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=summarize(sumSeries(seriesByTag('role=my-web-app','what=elb_2xx')),'1min','sum',false)&from=-168hours&until=now&format=json",
+        json=GRAPHITE_MOCK_RESPONSE,
+        status=200,
+    )
+    graphite_datasource = graphite(url="http://graphite")
+    df = graphite_datasource.query(
+        tags={
+            "role": "my-web-app",
+            "what": "elb_2xx",
+            "function": "summarize(sumSeries(seriesByTag('role=my-web-app','what=elb_2xx')),'1min','sum',false)",
+        },
+        start="-168hours",
+        end="now",
+        interval="1min",
+    )
+    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df.index, pd.DatetimeIndex)
+
+
+@responses.activate
 def test_graphite_query_with_interval():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))|summarize('1min','sum')&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=seriesByTag('role=my-web-app','what=elb_2xx')|summarize('1min','sum')&from=-168hours&until=now&format=json",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -39,11 +62,12 @@ def test_graphite_query_with_interval():
     assert isinstance(df, pd.DataFrame)
     assert isinstance(df.index, pd.DatetimeIndex)
 
+
 @responses.activate
 def test_graphite_query_with_empty_response():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))|summarize('1min','sum')&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=seriesByTag('role=my-web-app','what=elb_2xx')|summarize('1min','sum')&from=-168hours&until=now&format=json",
         json=[],
         status=200,
     )
