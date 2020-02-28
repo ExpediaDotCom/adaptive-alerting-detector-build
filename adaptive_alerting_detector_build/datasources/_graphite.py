@@ -17,10 +17,12 @@ class graphite(base_datasource):
         try:
             tag_query = ",".join([f"'{k}={v}'" for k, v in sorted(tags.items())])
             query = f"seriesByTag({tag_query})"
-            if fn == "sum":
-                query = f"sumSeries({query})"
-            if interval:
+            if "function" in tags:
+                query = tags["function"]
+            elif interval:
                 query = f"{query}|summarize('{interval}','{fn}')"
+            elif fn == "sum":
+                query = f"sumSeries({query})"
             params = {"target": query, "from": start, "until": end, "format": "json"}
             response = requests.get(self._render_url, params=params, timeout=60)
             response.raise_for_status()
