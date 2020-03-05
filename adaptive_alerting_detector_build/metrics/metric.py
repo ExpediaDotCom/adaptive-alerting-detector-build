@@ -13,7 +13,7 @@ class MetricType(Enum):
     REQUEST_COUNT = "REQUEST_COUNT"
     ERROR_COUNT = "ERROR_COUNT"
     SUCCESS_RATE = "SUCCESS_RATE"
-    LATENCY_AVG = "LATENCY_AVG"
+    LATENCY = "LATENCY"
 
 
 @related.immutable
