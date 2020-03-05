@@ -25,14 +25,22 @@ def from_json(payload):
 
 def build_detector(type, config, enabled=True, trusted=False, 
     last_updated=None, uuid=None, created_by=None, meta=None):
-    detector_class = get_detector_class(type)
+    
+    subtype = config["detectorMetaData"]["subtype"] if "detectorMetaData" in config else None
+
+    if subtype:
+        detector_class = get_detector_class(subtype)
+    else:
+        detector_class = get_detector_class(type) 
     if not detector_class:
         raise DetectorBuilderError(f"Unknown detector type '{type}'")
+    
     detector_config = related.to_model(detector_class.config_class, config)
     training_interval = getattr(detector_config.training_meta_data, "training_interval", "0")
+
     return detector_class(
         type=type, 
-        config=detector_config, 
+        config=detector_config,
         enabled=enabled, 
         trusted=trusted, 
         training_interval=training_interval,
