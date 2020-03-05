@@ -21,7 +21,7 @@ Options:
 Examples:
     adaptive-alerting build metrics.json
 
-    adaptive-alerting build metrics.json
+    adaptive-alerting train metrics.json
 
     adaptive-alerting delete metrics.json
 
