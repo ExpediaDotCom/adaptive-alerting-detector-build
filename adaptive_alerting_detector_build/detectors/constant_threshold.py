@@ -237,6 +237,9 @@ def _hampel_filter(input_series, window_size=10, n_sigmas=3):
     """
     
     n = len(input_series)
+    if n < 30:
+        raise DetectorBuilderError("Sample must have at least thirty elements")
+    
     series_wo_outliers = input_series.copy()
     k = 1.4826 # scale factor for Gaussian distribution
     outliers = []
