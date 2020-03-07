@@ -128,7 +128,7 @@ class ConstantThresholdDetector(Detector):
         elif strategy == ConstantThresholdStrategy.QUARTILE:
             self._train_quartile(data_drop_nan, threshold_type)
         elif strategy == ConstantThresholdStrategy.HIGHWATERMARK:
-            self._train_highwatermark(data_drop_nan, threshold_type)
+            self._train_highwatermark(data, threshold_type)
         
 
     def _train_sigma(self, sample, threshold_type):
@@ -199,9 +199,9 @@ class ConstantThresholdDetector(Detector):
             Detector object
         """
 
-        data_drop_nan = data.dropna(axis=0, how="any", inplace=False)
+        clean_data = _data_cleanup(data)
 
-        data_wo_outliers, outliers = _hampel_filter(np.array(data_drop_nan, dtype=np.float64), 
+        data_wo_outliers, outliers = _hampel_filter(np.array(clean_data, dtype=np.float64), 
                                                 self.config.hyperparams.hampel_window_size, 
                                                 self.config.hyperparams.hampel_n_signma)
 
@@ -217,6 +217,35 @@ class ConstantThresholdDetector(Detector):
                 strong_upper_threshold=strong_upper_threshold,
             ),
         )
+
+
+def _data_cleanup(input_series, trim_percentage=5):
+    """Performs data cleanup:
+            Trims data at the beginning and at the end by a given trim percentage.
+            Removes NaN in the data.
+
+        Parameters:
+            input_series: input series of number data
+            trim_percentage: percentage of data to be trimmed
+
+        Returns:
+            new_series: new series of data after cleanup
+    """
+
+    n = len(input_series)
+    if n < 33:
+        raise DetectorBuilderError("Sample must have at least thirty three elements")
+
+    trim_beg = int((trim_percentage/100)*n)
+    trim_end = int(((100-trim_percentage)/100)*n)
+
+    new_series = input_series.drop(axis=0, labels=[i for i in range(0,trim_beg+1)], inplace=False)
+    new_series = new_series.drop(axis=0, labels=[i for i in range(trim_end, n-1)], inplace=False)
+
+    new_series = new_series.dropna(axis=0, how="any", inplace=False)
+
+    return new_series
+
 
 @jit(nopython=True)
 def _hampel_filter(input_series, window_size=10, n_sigmas=3):

@@ -43,7 +43,12 @@ class TestCTHighwatermarkDetector:
         assert isclose(detector_class.config.params.thresholds.strong_upper_threshold, 0.612911, rel_tol=0.0001)
         assert isclose(detector_class.config.params.thresholds.weak_upper_threshold, 0.585052, rel_tol=0.0001)
 
-    def test_data_raises_error_with_empty_list(self):
+    def test_data_raises_error_with_empty_list_a(self):
+        with pytest.raises(exceptions.DetectorBuilderError) as exception:
+            ct._data_cleanup(pandas.Series([]))
+        assert str(exception.value) == "Sample must have at least thirty three elements"
+    
+    def test_data_raises_error_with_empty_list_b(self):
         with pytest.raises(exceptions.DetectorBuilderError) as exception:
             ct._hampel_filter(np.array([], dtype=np.float64))
         assert str(exception.value) == "Sample must have at least thirty elements"
