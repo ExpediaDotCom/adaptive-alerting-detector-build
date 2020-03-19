@@ -128,7 +128,7 @@ class ConstantThresholdDetector(Detector):
         elif strategy == ConstantThresholdStrategy.QUARTILE:
             self._train_quartile(data_drop_nan, threshold_type)
         elif strategy == ConstantThresholdStrategy.HIGHWATERMARK:
-            self._train_highwatermark(data, threshold_type)
+            self._train_highwatermark(data.squeeze(), threshold_type)
         
 
     def _train_sigma(self, sample, threshold_type):
