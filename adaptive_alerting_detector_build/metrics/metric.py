@@ -97,11 +97,13 @@ class Metric:
             type="constant-detector",
             config=dict(
                 hyperparams=dict(
-                    strategy="sigma", 
+                    strategy="highwatermark", 
                     lower_weak_multiplier=3.0, 
                     lower_strong_multiplier=4.0,
-                    upper_weak_multiplier=3.0, 
-                    upper_strong_multiplier=4.0
+                    upper_weak_multiplier=1.05, 
+                    upper_strong_multiplier=1.10,
+                    hampel_window_size=10,
+                    hampel_n_sigma=3
                 )
             ),
         )
