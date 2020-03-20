@@ -10,7 +10,7 @@ from typing import Optional
 from enum import unique, Enum
 import logging
 import numpy as np
-#import pandas as pd
+import pandas as pd
 import numba
 
 from numba import jit
@@ -128,8 +128,8 @@ class ConstantThresholdDetector(Detector):
         elif strategy == ConstantThresholdStrategy.QUARTILE:
             self._train_quartile(data_drop_nan, threshold_type)
         elif strategy == ConstantThresholdStrategy.HIGHWATERMARK:
-            self._train_highwatermark(data.squeeze(), threshold_type)
-        
+            data_series = pd.Series(np.array(data.squeeze()))
+            self._train_highwatermark(data_series, threshold_type)
 
     def _train_sigma(self, sample, threshold_type):
         """Performs threshold calculations using sigma (standard deviation) strategy.

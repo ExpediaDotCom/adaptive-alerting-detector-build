@@ -19,7 +19,6 @@ import json
 
 from tests.conftest import FIND_BY_MATCHING_TAGS_EMPTY_MOCK_RESPONSE, MOCK_DETECTORS
 
-
 def test_calculate_sigma_for_integers():
     sample = [5, 4, 7, 9, 15, 1, 0]
     assert isclose(ct._calculate_sigma(sample), 5.1130086, rel_tol=0.0001)
@@ -221,3 +220,19 @@ def test_invalid_metric_type_raises_error(mock_metric):
     with pytest.raises(exceptions.DetectorBuilderError) as exception:
         test_detector.train(data, test_metric.config["type"])
     assert str(exception.value) == "Unknown metric_type"
+
+def test_build_detector_with_highwatermark_strategy(mock_metric):
+        detector_config = dict(
+            hyperparams=dict(upper_weak_multiplier=1.05, upper_strong_multiplier=1.10, 
+                hampel_window_size=10, hampel_n_sigma=3, strategy="highwatermark")
+        )
+        test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0, 5, 4, 7, 9, 15, 1, 0, 5, 4, 7, 9, 15, 1, 0,5, 4, 7, 9, 15, 1, 0, 5, 4, 7, 9, 15, 1, 0])
+        test_detector = build_detector("constant-detector", detector_config)
+        data = test_metric.query()
+        print("data output from query=",data)
+        test_detector.train(data, test_metric.config["type"])
+        assert (
+            test_detector.config.hyperparams.strategy == ConstantThresholdStrategy.HIGHWATERMARK
+        )
+        print(test_detector.config.params.thresholds.strong_upper_threshold)
+        print(test_detector.config.params.thresholds.weak_upper_threshold)
