@@ -47,7 +47,7 @@ def test_build_metric_detectors(mock_metric):
             json=MOCK_DETECTORS[0],
             status=200)
 
-    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
+    test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0,5, 4, 7, 9, 15, 1, 0,5, 4, 7, 9, 15, 1, 0,5, 4, 7, 9, 15, 1, 0,5, 4, 7, 9, 15, 1, 0])
     assert len(test_metric.detectors) == 0
     new_detectors = test_metric.build_detectors()
     assert len(new_detectors) == 1

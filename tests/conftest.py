@@ -32,7 +32,7 @@ METRIC_DETECTOR_MAPPINGS = json.loads(
 @pytest.fixture
 def mock_metric():
     def create_mock_metric(
-        data=None, metric_type="REQUEST_COUNT", model_service_url="http://modelservice"
+        data=None, metric_type="LATENCY", model_service_url="http://modelservice"
     ):
         metric_config = {
             "type": metric_type,
