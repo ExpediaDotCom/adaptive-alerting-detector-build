@@ -67,7 +67,7 @@ class ConstantThresholdParams:
 
 @related.mutable
 class ConstantThresholdTrainingMetaData:
-    training_interval = related.StringField(default="7d", key="trainingInterval")
+    training_interval = related.StringField(default="3d", key="trainingInterval")
 
 
 @related.mutable
@@ -128,7 +128,7 @@ class ConstantThresholdDetector(Detector):
         elif strategy == ConstantThresholdStrategy.QUARTILE:
             self._train_quartile(data_drop_nan, threshold_type)
         elif strategy == ConstantThresholdStrategy.HIGHWATERMARK:
-            data_series = pd.Series(np.array(data.squeeze()))
+            data_series = pd.Series(np.array(data_drop_nan.squeeze()))
             self._train_highwatermark(data_series, threshold_type)
 
     def _train_sigma(self, sample, threshold_type):
@@ -199,13 +199,13 @@ class ConstantThresholdDetector(Detector):
             Detector object
         """
 
-        clean_data = _data_cleanup(data)
-
-        data_wo_outliers, outliers = _hampel_filter(np.array(clean_data, dtype=np.float64), 
+        data_wo_outliers, outliers = _hampel_filter(np.array(data, dtype=np.float64), 
                                                 self.config.hyperparams.hampel_window_size, 
                                                 self.config.hyperparams.hampel_n_signma)
+        
+        clean_data = _data_cleanup(pd.Series(data_wo_outliers))
 
-        highwatermark = data_wo_outliers.max()
+        highwatermark = clean_data.max()
 
         strong_upper_threshold = self.config.hyperparams.upper_strong_multiplier * highwatermark
         weak_upper_threshold = self.config.hyperparams.upper_weak_multiplier * highwatermark
@@ -219,30 +219,27 @@ class ConstantThresholdDetector(Detector):
         )
 
 
-def _data_cleanup(input_series, trim_percentage=5):
+def _data_cleanup(input_series):
     """Performs data cleanup:
-            Trims data at the beginning and at the end by a given trim percentage.
-            Removes NaN in the data.
+            Uses interquartile range to determine outliers. Any datapoint greater than 3*IQR is 
+            considered an outllier and will be removed from the data.
+            https://en.wikipedia.org/wiki/Interquartile_range
 
         Parameters:
             input_series: input series of number data
-            trim_percentage: percentage of data to be trimmed
 
         Returns:
             new_series: new series of data after cleanup
     """
 
     n = len(input_series)
-    if n < 33:
-        raise DetectorBuilderError("Sample must have at least thirty three elements")
+    if n < 30:
+        raise DetectorBuilderError("Sample must have at least thirty elements")
 
-    trim_beg = int((trim_percentage/100)*n)
-    trim_end = int(((100-trim_percentage)/100)*n)
-
-    new_series = input_series.drop(axis=0, labels=[i for i in range(0,trim_beg+1)], inplace=False)
-    new_series = new_series.drop(axis=0, labels=[i for i in range(trim_end, n-1)], inplace=False)
-
-    new_series = new_series.dropna(axis=0, how="any", inplace=False)
+    q1, q3 = input_series.quantile([0.25, 0.75], interpolation="midpoint")
+    iqr = q3-q1
+    drop_labels = [i for i in range(0, len(input_series)) if  input_series[i] > (q3 + 3*iqr)]
+    new_series = input_series.drop(labels=drop_labels)
 
     return new_series
 
