@@ -46,7 +46,7 @@ class TestCTHighwatermarkDetector:
     def test_data_raises_error_with_empty_list_a(self):
         with pytest.raises(exceptions.DetectorBuilderError) as exception:
             ct._data_cleanup(pandas.Series([]))
-        assert str(exception.value) == "Sample must have at least thirty three elements"
+        assert str(exception.value) == "Sample must have at least thirty elements"
     
     def test_data_raises_error_with_empty_list_b(self):
         with pytest.raises(exceptions.DetectorBuilderError) as exception:
