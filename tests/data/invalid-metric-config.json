@@ -1,0 +1,8 @@
+[
+  {
+    "name": "My App Request Count",
+    "type": "INVALID_METRIC_TYPE",
+    "description": "Request Count.",
+    "tags": { "app": "my-web-app", "what": "request_count" }
+  }
+]

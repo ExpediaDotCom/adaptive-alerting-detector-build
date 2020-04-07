@@ -1,11 +1,11 @@
 [
   {
-    "name": "My App Request Count",
-    "type": "REQUEST_COUNT",
-    "description": "Sum of requests received.",
+    "name": "My App Error Count",
+    "type": "ERROR_COUNT",
+    "description": "Sum of errors received.",
     "tags": {
       "app": "my-web-app",
-      "what": "elb_2xx"
+      "what": "error_count"
     }
   }
 ]

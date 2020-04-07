@@ -54,6 +54,11 @@ def read_config_file(json_config_file_path):
             for raw_metric_config in raw_metric_configs:
                 metric_config = related.to_model(MetricConfig, raw_metric_config)
                 metric_configs.append(metric_config)
+    except ValueError as e:
+        logging.exception(
+            f"Exception {e.__class__.__name__} while reading config file '{e}'! Skipping!"
+        )
+        exit_code = 1
     except Exception as e:
         logging.exception(
             f"Exception {e.__class__.__name__} while reading config file '{json_config_file_path}'! Skipping!"
@@ -76,6 +81,10 @@ def build_detectors_for_metric_configs(metric_configs):
                 )
             if not new_detectors:
                 logging.info(f"No detectors built for metric '{metric_config.name}'")
+        except AdaptiveAlertingDetectorBuildError as e:
+            logging.warning(
+                f"Unable to train detector for metric '{metric_config.name}',  {e.msg}! Skipping!"
+            )                
         except Exception as e:
             logging.exception(
                 f"Exception {e.__class__.__name__} while creating detector for metric {metric_config.name}! Skipping!"
@@ -104,6 +113,11 @@ def train_detectors_for_metric_configs(metric_configs):
                     logging.info(
                         f"Training not required for '{detector.type}' detector with UUID: {detector.uuid}"
                     )
+        except AdaptiveAlertingDetectorBuildError as e:
+            logging.error(
+                f"Unable to train detector for metric '{metric_config.name}',  {e.msg}! Skipping!"
+            )     
+            exit_code = 0
         except Exception as e:
             logging.exception(
                 f"Exception {e.__class__.__name__} while training detector(s) for metric {metric_config.name}! Skipping!"

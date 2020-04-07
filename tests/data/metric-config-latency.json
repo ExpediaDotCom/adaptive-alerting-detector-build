@@ -1,0 +1,11 @@
+[
+  {
+    "name": "My App Request Latency",
+    "type": "LATENCY",
+    "description": "Request latency.",
+    "tags": {
+      "app": "my-web-app",
+      "what": "tp90"
+    }
+  }
+]

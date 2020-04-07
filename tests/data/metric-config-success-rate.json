@@ -1,11 +1,11 @@
 [
   {
     "name": "My App Request Count",
-    "type": "REQUEST_COUNT",
-    "description": "Sum of requests received.",
+    "type": "SUCCESS_RATE",
+    "description": "Rate of errors / requests received.",
     "tags": {
       "app": "my-web-app",
-      "what": "elb_2xx"
+      "what": "success_Rate"
     }
   }
 ]
