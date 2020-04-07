@@ -25,5 +25,14 @@
       "app": "my-web-app",
       "what": "elb_success_rate"
     }
+  },
+  {
+    "name": "My App Latency",
+    "type": "LATENCY",
+    "description": "90th Percentile Response Time",
+    "tags": {
+      "app": "my-web-app",
+      "what": "tp90"
+    }
   }
 ]

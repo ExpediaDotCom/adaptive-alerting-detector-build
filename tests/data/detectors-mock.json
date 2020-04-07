@@ -100,5 +100,39 @@
           "trainingInterval": "7d"
         }
       }
+    },
+    {
+      "uuid": "5afc2bb3-4a5b-4a4b-8e30-890d67904588",
+      "type": "constant-detector",
+      "enabled": true,
+      "trusted": true,
+      "meta": {
+        "dateCreated": "2019-11-13T23:23:21.226+0000",
+        "dateUpdated": "2019-11-13T23:23:21.226+0000",
+        "createdBy": null,
+        "updatedBy": null
+      },
+      "dateCreated": null,
+      "lastUpdateTimestamp": "2019-11-13 23:23:21",
+      "createdBy": "a_username",
+      "detectorConfig": {
+        "hyperparams": {
+          "strategy": "highwatermark",
+          "lower_weak_multiplier": 3.0, 
+          "lower_strong_multiplier": 4.0,
+          "upper_weak_multiplier": 3.0, 
+          "upper_strong_multiplier": 4.0
+        },
+        "params": {
+          "type": "RIGHT_TAILED",
+          "thresholds": {
+            "upperWeak": 89,
+            "upperStrong": 210
+          }
+        },
+        "trainingMetaData": {
+          "trainingInterval": "7d"
+        }
+      }
     }
 ]

@@ -10,6 +10,8 @@ from adaptive_alerting_detector_build.metrics import Metric
 
 GRAPHITE_MOCK_RESPONSE = json.loads(open("tests/data/graphite-mock.json").read())
 
+GRAPHITE_SPARSE_DATA_MOCK_RESPONSE = json.loads(open("tests/data/graphite-mock-sparse-data.json").read())
+
 DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE = json.loads(
     open("tests/data/detector-mappings-mock.json").read()
 )
