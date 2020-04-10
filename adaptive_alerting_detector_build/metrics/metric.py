@@ -1,5 +1,6 @@
 import datetime
 from enum import unique, Enum
+import json
 import related
 import requests
 from adaptive_alerting_detector_build.config import get_datasource_config
@@ -25,6 +26,10 @@ class MetricConfig:
     datasource = related.ChildField(
         dict, default=get_datasource_config(), required=False
     )
+
+    @property
+    def tag_key(self):
+        return json.dumps(self.tags, sort_keys=True)
 
 
 class Metric:
@@ -89,6 +94,23 @@ class Metric:
             deleted_detectors.append(detector)
         return deleted_detectors
 
+    def disable_detectors(self):
+        """
+        Sets 'enabled=false' for all detectors/mappings for the metric.
+        """
+        disabled_detectors = []
+        for detector in self.detectors:
+            detector_mappings = self._detector_client.list_detector_mappings(
+                detector.uuid
+            )
+            for detector_mapping in detector_mappings:
+                self._detector_client.disable_metric_detector_mapping(
+                    detector_mapping.id
+                )
+            self._detector_client.disable_detector(detector.uuid)
+            disabled_detectors.append(detector)
+        return disabled_detectors
+
     def select_detectors(self):
         """
         TODO: Use metric profile data to determine which detectors to use
@@ -117,6 +139,7 @@ class Metric:
         for detector in self.detectors:
             if detector.needs_training:
                 detector.train(data=self.query(), metric_type=self.config["type"])
+                detector.enabled = True
                 updated_detector = self._detector_client.update_detector(detector)
                 updated_detectors.append(updated_detector)
         return updated_detectors

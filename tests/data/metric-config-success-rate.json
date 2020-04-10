@@ -5,7 +5,7 @@
     "description": "Rate of errors / requests received.",
     "tags": {
       "app": "my-web-app",
-      "what": "success_Rate"
+      "what": "elb_success_rate"
     }
   }
 ]

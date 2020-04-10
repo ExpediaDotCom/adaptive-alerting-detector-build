@@ -1,0 +1,38 @@
+[
+  {
+    "name": "My App Request Count Fixed",
+    "type": "REQUEST_COUNT",
+    "description": "Sum of requests received. New metric config.",
+    "tags": {
+      "app": "my-web-app",
+      "what": "requests"
+    }
+  },
+  {
+    "name": "My App Error Count",
+    "type": "ERROR_COUNT",
+    "description": "Sum of errors received. Updated description.",
+    "tags": {
+      "app": "my-web-app",
+      "what": "elb_5xx"
+    }
+  },
+  {
+    "name": "My App Success Rate",
+    "type": "SUCCESS_RATE",
+    "description": "Ratio of Requests Count vs Errors Count (1 - (ERROR_COUNT/REQUEST_COUNT))",
+    "tags": {
+      "app": "my-web-app",
+      "what": "elb_success_rate"
+    }
+  },
+  {
+    "name": "My App Latency",
+    "type": "LATENCY",
+    "description": "90th Percentile Response Time",
+    "tags": {
+      "app": "my-web-app",
+      "what": "tp90"
+    }
+  }
+]
