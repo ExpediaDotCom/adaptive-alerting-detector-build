@@ -1,6 +1,7 @@
-from adaptive_alerting_detector_build.cli import delete_detectors_for_metric_configs
+from adaptive_alerting_detector_build.cli import disable_detectors_for_metric_configs
 from adaptive_alerting_detector_build.cli import read_config_file, build_detectors_for_metric_configs
 from adaptive_alerting_detector_build.cli import train_detectors_for_metric_configs
+from adaptive_alerting_detector_build.cli import diff_metric_configs
 
 from freezegun import freeze_time
 import logging
@@ -112,7 +113,7 @@ def test_cli_build_new_detectors(caplog):
 
 
 @responses.activate
-def test_cli_delete_metric_detectors(caplog):
+def test_cli_disable_metric_detectors(caplog):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
@@ -128,55 +129,21 @@ def test_cli_delete_metric_detectors(caplog):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
             json=[DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE[1]],
             status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=5XeANXABlK1-eG-Fo78V",
+    responses.add(responses.PUT, "http://modelservice/api/detectorMappings/disable?id=5XeANXABlK1-eG-Fo78V",
             status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=6XeANXABlK1-eG-Fo78V",
+    responses.add(responses.PUT, "http://modelservice/api/detectorMappings/disable?id=6XeANXABlK1-eG-Fo78V",
             status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.POST, "http://modelservice/api/v2/detectors/toggleDetector?enabled=false&uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
-            status=200)
-    metric_configs, exit_code = read_config_file("./tests/data/metric-config-request-count.json")
-    delete_exit_code = delete_detectors_for_metric_configs(metric_configs)
-    assert delete_exit_code == 0
-    assert len(caplog.records) == 3
-    assert caplog.records[0].msg == "Reading configuration file: ./tests/data/metric-config-request-count.json"
-    assert caplog.records[1].msg == "Detector/Detector Mapping with UUID '4fdc3395-e969-449a-a306-201db183c6d7' deleted."
-    assert caplog.records[2].msg == "Detector/Detector Mapping with UUID '47a0661d-aceb-4ef2-bf06-0828f28631b4' deleted."
-
-@responses.activate
-def test_cli_train_metric_detectors(caplog):
-    responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
-            json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
-            status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
-            json=MOCK_DETECTORS[0],
-            status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
-            json=MOCK_DETECTORS[1],
-            status=200)
-    responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
-            json=[DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE[0]],
-            status=200)
-    responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
-            json=[DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE[1]],
-            status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=5XeANXABlK1-eG-Fo78V",
-            status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=6XeANXABlK1-eG-Fo78V",
-            status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
-            status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.POST, "http://modelservice/api/v2/detectors/toggleDetector?enabled=false&uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             status=200)
     metric_configs, exit_code = read_config_file("./tests/data/metric-config-request-count.json")
-    delete_exit_code = delete_detectors_for_metric_configs(metric_configs)
-    assert delete_exit_code == 0
+    disable_exit_code = disable_detectors_for_metric_configs(metric_configs)
+    assert disable_exit_code == 0
     assert len(caplog.records) == 3
     assert caplog.records[0].msg == "Reading configuration file: ./tests/data/metric-config-request-count.json"
-    assert caplog.records[1].msg == "Detector/Detector Mapping with UUID '4fdc3395-e969-449a-a306-201db183c6d7' deleted."
-    assert caplog.records[2].msg == "Detector/Detector Mapping with UUID '47a0661d-aceb-4ef2-bf06-0828f28631b4' deleted."
-
+    assert caplog.records[1].msg == "Detector/Detector Mapping with UUID '4fdc3395-e969-449a-a306-201db183c6d7' disabled."
+    assert caplog.records[2].msg == "Detector/Detector Mapping with UUID '47a0661d-aceb-4ef2-bf06-0828f28631b4' disabled."
 
 @responses.activate
 def test_cli_train_metric_detectors_sparse_data(caplog):
@@ -208,7 +175,34 @@ def test_cli_train_metric_detectors_sparse_data(caplog):
 @responses.activate
 def test_cli_invalid_metric_config(caplog):
     metric_configs, exit_code = read_config_file("./tests/data/invalid-metric-config.json")
-    assert exit_code == 1
+    assert exit_code == 0
     assert len(caplog.records) == 2
     assert caplog.records[0].msg == "Reading configuration file: ./tests/data/invalid-metric-config.json"
     assert caplog.records[1].msg == "Exception ValueError while reading config file 'Failed to convert value (INVALID_METRIC_TYPE) to child object class (<enum 'MetricType'>). ... [Original error message: 'INVALID_METRIC_TYPE' is not a valid MetricType]'! Skipping!"
+
+@responses.activate
+def test_cli_missing_metric_config_file(caplog):
+    metric_configs, exit_code = read_config_file("./tests/data/missing-metric-config.json")
+    assert exit_code == 1
+    assert len(caplog.records) == 2
+    assert caplog.records[0].msg == "Reading configuration file: ./tests/data/missing-metric-config.json"
+    assert caplog.records[1].msg == "Exception FileNotFoundError while reading config file './tests/data/missing-metric-config.json'! Skipping!"
+
+
+@responses.activate
+def test_cli_diff_metric_configs(caplog):
+    previous, exit_code = read_config_file("./tests/data/metric-config.json")
+    assert exit_code == 0
+    current, exit_code = read_config_file("./tests/data/metric-config-v2.json")
+    assert len(caplog.records) == 2
+    assert caplog.records[0].msg == "Reading configuration file: ./tests/data/metric-config.json"
+    assert caplog.records[1].msg == "Reading configuration file: ./tests/data/metric-config-v2.json"
+    diff = diff_metric_configs(previous, current)
+    assert len(diff["added"]) == 1
+    assert diff["added"][0]["name"] == "My App Request Count Fixed"
+    assert len(diff["modified"]) == 1
+    assert diff["modified"][0]["name"] == "My App Error Count"
+    assert len(diff["deleted"]) == 1
+    assert diff["deleted"][0]["name"] == "My App Request Count"
+
+

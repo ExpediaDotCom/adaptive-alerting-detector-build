@@ -7,8 +7,9 @@ from adaptive_alerting_detector_build.datasources import (
 
 
 class graphite(base_datasource):
-    def __init__(self, url, **kwargs):
+    def __init__(self, url, headers={}, **kwargs):
         self._url = url
+        self._headers = headers
         self._render_url = f"{url}/render"
         super(graphite, self).__init__(**kwargs)
 
@@ -24,7 +25,7 @@ class graphite(base_datasource):
             elif fn == "sum":
                 query = f"sumSeries({query})"
             params = {"target": query, "from": start, "until": end, "format": "json"}
-            response = requests.get(self._render_url, params=params, timeout=60)
+            response = requests.get(self._render_url, params=params, headers=self._headers, timeout=60)
             response.raise_for_status()
             response_list = response.json()
             data = list()

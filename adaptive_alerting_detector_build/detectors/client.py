@@ -29,6 +29,12 @@ class DetectorBuilderClientError(DetectorBuilderError):
 
 
 class DetectorClient:
+    """
+    Detectors can't be managed without looking up by a metric, so the only way to
+    create a detector is to lookup the metric first and see that it doesn't exist.
+    If a detector already exists for metric, DetectorBuilderError is raised.
+    """
+
     def __init__(self, model_service_url=None, model_service_user=None, **kwargs):
         if model_service_url:
             self._url = model_service_url
@@ -86,11 +92,6 @@ class DetectorClient:
         return detector_mappings
 
     def save_metric_detector_mapping(self, detector_uuid, metric):
-        """
-        Detectors can't be managed without looking up by a metric, so the only way to
-        create a detector is to lookup the metric first and see that it doesn't exist.
-        If a detector already exists for metric, DetectorBuilderError is raised.
-        """
         metric_detector_mapping = build_metric_detector_mapping(detector_uuid, metric)
         create_metric_detector_mapping = requests.post(
             f"{self._url}/api/detectorMappings",
@@ -100,22 +101,18 @@ class DetectorClient:
         create_metric_detector_mapping.raise_for_status()
 
     def delete_metric_detector_mapping(self, detector_mapping_id):
-        """
-        Detectors can't be managed without looking up by a metric, so the only way to
-        create a detector is to lookup the metric first and see that it doesn't exist.
-        If a detector already exists for metric, DetectorBuilderError is raised.
-        """
         response = requests.delete(
             f"{self._url}/api/detectorMappings?id={detector_mapping_id}", timeout=30
         )
         response.raise_for_status()
 
+    def disable_metric_detector_mapping(self, detector_mapping_id):
+        response = requests.put(
+            f"{self._url}/api/detectorMappings/disable?id={detector_mapping_id}", timeout=30
+        )
+        response.raise_for_status()
+
     def create_detector(self, detector):
-        """
-        Detectors can't be managed without looking up by a metric, so the only way to
-        create a detector is to lookup the metric first and see that it doesn't exist.
-        If a detector already exists for metric, DetectorBuilderError is raised.
-        """
         detector.created_by = self._user
         create_detector_request = related.to_dict(detector, suppress_empty_values=True)
         create_detector_response = requests.post(
@@ -159,25 +156,31 @@ class DetectorClient:
         response.raise_for_status()
         return self.get_detector(detector.uuid)
 
-    def delete_detector(self, detector_uuid):
+    def disable_detector(self, detector_uuid):
         """
-
+        
         """
-        response = requests.delete(
-            f"{self._url}/api/v2/detectors?uuid={detector_uuid}", timeout=30
+        response = requests.post(
+            f"{self._url}/api/v2/detectors/toggleDetector?enabled=false&uuid={detector_uuid}",
+            json={},
+            timeout=30
         )
         response.raise_for_status()
 
-    def create_metric_detector(self, detector, metric):
+    def enable_detector(self, detector_uuid):
         """
         
         """
-        new_detector = self.create_detector(detector)
-        self.save_metric_detector_mapping(new_detector.uuid, metric)
+        response = requests.get(
+            f"{self._url}/api/v2/detectors/toggleDetector?enabled=true&uuid={detector_uuid}",
+            json={},
+            timeout=30
+        )
+        response.raise_for_status()
 
-    def delete_metric_detector(self, detector_uuid):
+    def delete_detector(self, detector_uuid):
         """
-        
+
         """
         response = requests.delete(
             f"{self._url}/api/v2/detectors?uuid={detector_uuid}", timeout=30

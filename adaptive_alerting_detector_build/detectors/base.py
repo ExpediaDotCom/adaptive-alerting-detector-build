@@ -27,6 +27,7 @@ class Detector:
     created_by = related.StringField(required=False, key="createdBy")
     meta = related.ChildField(DetectorMeta, required=False)
 
+    
     def train(self, data, *args, **kwargs):
         """
         TODO: Add metadata boolean that tells if the detector needs training.
