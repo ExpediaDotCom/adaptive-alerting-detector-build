@@ -175,10 +175,18 @@ def test_cli_train_metric_detectors_sparse_data(caplog):
 @responses.activate
 def test_cli_invalid_metric_config(caplog):
     metric_configs, exit_code = read_config_file("./tests/data/invalid-metric-config.json")
-    assert exit_code == 1
+    assert exit_code == 0
     assert len(caplog.records) == 2
     assert caplog.records[0].msg == "Reading configuration file: ./tests/data/invalid-metric-config.json"
     assert caplog.records[1].msg == "Exception ValueError while reading config file 'Failed to convert value (INVALID_METRIC_TYPE) to child object class (<enum 'MetricType'>). ... [Original error message: 'INVALID_METRIC_TYPE' is not a valid MetricType]'! Skipping!"
+
+@responses.activate
+def test_cli_missing_metric_config_file(caplog):
+    metric_configs, exit_code = read_config_file("./tests/data/missing-metric-config.json")
+    assert exit_code == 1
+    assert len(caplog.records) == 2
+    assert caplog.records[0].msg == "Reading configuration file: ./tests/data/missing-metric-config.json"
+    assert caplog.records[1].msg == "Exception FileNotFoundError while reading config file './tests/data/missing-metric-config.json'! Skipping!"
 
 
 @responses.activate

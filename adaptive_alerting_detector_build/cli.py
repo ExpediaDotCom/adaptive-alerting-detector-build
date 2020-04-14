@@ -59,13 +59,13 @@ def read_config_file(json_config_file_path):
             if not isinstance(raw_metric_configs, list):
                 raise ValueError()
             for raw_metric_config in raw_metric_configs:
-                metric_config = related.to_model(MetricConfig, raw_metric_config)
-                metric_configs.append(metric_config)
-    except ValueError as e:
-        logging.exception(
-            f"Exception {e.__class__.__name__} while reading config file '{e}'! Skipping!"
-        )
-        exit_code = 1
+                try:
+                    metric_config = related.to_model(MetricConfig, raw_metric_config)
+                    metric_configs.append(metric_config)
+                except ValueError as e:
+                    logging.exception(
+                        f"Exception {e.__class__.__name__} while reading config file '{e}'! Skipping!"
+                    )
     except Exception as e:
         logging.exception(
             f"Exception {e.__class__.__name__} while reading config file '{json_config_file_path}'! Skipping!"
