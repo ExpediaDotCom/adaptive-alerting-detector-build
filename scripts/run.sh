@@ -27,7 +27,7 @@ then
         PREVIOUS_FILE=$(echo $MODIFIED_FILE | sed s/\.json$/\.json\.previous/)
         git show HEAD^:$MODIFIED_FILE > $PREVIOUS_FILE
         DIFF_CONFIGS_FILE=$(echo $MODIFIED_FILE | sed s/\.json$/\.json\.diff/)
-        adaptive-alerting diff $PREVIOUS_FILE $MODIFIED_FILE > $DIFF_CONFIGS_FILE
+        adaptive-alerting diff $PREVIOUS_FILE $MODIFIED_FILE $DIFF_CONFIGS_FILE
 
         DELETED_CONFIGS_FILE=$(echo $MODIFIED_FILE | sed s/\.json$/\.json\.deleted/)
         cat $DIFF_CONFIGS_FILE | jq '.deleted' > $DELETED_CONFIGS_FILE
