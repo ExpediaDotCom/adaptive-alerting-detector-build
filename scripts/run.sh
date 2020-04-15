@@ -22,7 +22,7 @@ fi
 
 if [ -n "$MODIFIED" ]
 then
-    for MODIFIED_FILE in "$MODIFIED"
+    for MODIFIED_FILE in $MODIFIED
     do
         PREVIOUS_FILE=$(echo $MODIFIED_FILE | sed s/\.json$/\.json\.previous/)
         git show HEAD^:$MODIFIED_FILE > $PREVIOUS_FILE
