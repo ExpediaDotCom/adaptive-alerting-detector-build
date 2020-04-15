@@ -8,7 +8,11 @@ MODIFIED=$(git diff --name-only $PREVIOUS_GIT_COMMIT $GIT_COMMIT --diff-filter=M
 
 if [ -n "$DELETED" ]
 then
-    adaptive-alerting disable $DELETED
+    for DELETED_FILE in $DELETED
+    do
+        git show HEAD^:$DELETED_FILE > $DELETED_FILE
+        adaptive-alerting disable $DELETED_FILE
+    done
 else
     echo "No files deleted."
 fi
