@@ -58,7 +58,7 @@ def test_cli_build_new_detectors(caplog):
             status=200)
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -71,7 +71,7 @@ def test_cli_build_new_detectors(caplog):
             status=200)
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_5xx'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_5xx'))&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -84,7 +84,7 @@ def test_cli_build_new_detectors(caplog):
             status=200)
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_success_rate'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_success_rate'))&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -97,7 +97,7 @@ def test_cli_build_new_detectors(caplog):
             status=200)
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -160,7 +160,7 @@ def test_cli_train_metric_detectors_sparse_data(caplog):
             status=200)
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_SPARSE_DATA_MOCK_RESPONSE,
         status=200,
     )

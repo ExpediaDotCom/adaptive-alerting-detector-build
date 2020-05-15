@@ -9,7 +9,7 @@ from tests.conftest import GRAPHITE_MOCK_RESPONSE
 def test_graphite_query():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -25,7 +25,7 @@ def test_graphite_query():
 def test_graphite_query_with_function_tag():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=summarize(sumSeries(seriesByTag('role=my-web-app','what=elb_2xx')),'1min','sum',false)&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=summarize(sumSeries(seriesByTag('role=my-web-app','what=elb_2xx')),'1min','sum',false)&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -48,7 +48,7 @@ def test_graphite_query_with_function_tag():
 def test_graphite_query_with_interval():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=seriesByTag('role=my-web-app','what=elb_2xx')|summarize('1min','sum')&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=seriesByTag('role=my-web-app','what=elb_2xx')|summarize('1min','sum')&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -67,7 +67,7 @@ def test_graphite_query_with_interval():
 def test_graphite_query_with_empty_response():
     responses.add(
         responses.GET,
-        "http://graphite/render?target=seriesByTag('role=my-web-app','what=elb_2xx')|summarize('1min','sum')&from=-168hours&until=now&format=json",
+        "http://graphite/render?target=seriesByTag('role=my-web-app','what=elb_2xx')|summarize('1min','sum')&from=-168hours&until=now&format=json&maxDataPoints=2147483647",
         json=[],
         status=200,
     )
