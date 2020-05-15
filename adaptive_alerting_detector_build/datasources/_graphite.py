@@ -24,7 +24,8 @@ class graphite(base_datasource):
                 query = f"{query}|summarize('{interval}','{fn}')"
             elif fn == "sum":
                 query = f"sumSeries({query})"
-            params = {"target": query, "from": start, "until": end, "format": "json"}
+            # maxDataPoints is set to 2147483647 so that we get raw data as often as possible
+            params = {"target": query, "from": start, "until": end, "format": "json", "maxDataPoints": "2147483647"}
             response = requests.get(self._render_url, params=params, headers=self._headers, timeout=60)
             response.raise_for_status()
             response_list = response.json()

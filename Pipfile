@@ -17,7 +17,6 @@ numba = "*"
 
 [dev-packages]
 pytest = "*"
-pylint = "*"
 pipenv-setup = "*"
 pytest-cov = "*"
 adaptive-alerting-detector-build = {editable = true,path = "."}
@@ -26,6 +25,7 @@ pytest-env = "*"
 pipenv = "*"
 flake8 = "*"
 freezegun = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.7"

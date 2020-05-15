@@ -1,6 +1,6 @@
 -i https://pypi.org/simple
 attrs==19.3.0
-certifi==2019.11.28
+certifi==2020.4.5.1
 chardet==3.0.4
 cycler==0.10.0
 dataclasses==0.6 ; python_version < '3.7'
@@ -8,20 +8,20 @@ docopt==0.6.2
 future==0.18.2
 idna==2.9
 kiwisolver==1.2.0
-llvmlite==0.31.0
+llvmlite==0.32.1
 matplotlib==3.2.1
-numba==0.48.0
-numpy==1.18.2
+numba==0.49.1
+numpy==1.18.4
 pandas==0.24.2
 patsy==0.5.1
-pyparsing==2.4.6
+pyparsing==2.4.7
 python-dateutil==2.8.1
-pytz==2019.3
+pytz==2020.1
 pyyaml==5.3.1
 related==0.7.2
 requests==2.23.0
 scipy==1.4.1
-seaborn==0.10.0
+seaborn==0.10.1
 six==1.14.0
 statsmodels==0.11.1
-urllib3==1.25.8
+urllib3==1.25.9

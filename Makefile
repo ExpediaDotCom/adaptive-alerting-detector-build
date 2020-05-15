@@ -24,4 +24,5 @@ build :
 	pipenv lock --requirements > requirements.txt
 	pipenv install --dev
 	pipenv run pipenv-setup sync
-	pipenv check
+	# see https://github.com/pypa/pipenv/issues/3860
+	export PIPENV_PYUP_API_KEY="" && pipenv check
