@@ -18,10 +18,10 @@ def test_detector_client_list_detectors_for_metric(mock_metric):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     detector_client = DetectorClient()
@@ -40,10 +40,10 @@ def test_build_metric_detectors(mock_metric):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings",
             json=[],
             status=200)
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors",
             body="4fdc3395-e969-449a-a306-201db183c6d7",
             status=201)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
 
@@ -66,10 +66,10 @@ def test_delete_metric_detectors(mock_metric):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
@@ -82,9 +82,9 @@ def test_delete_metric_detectors(mock_metric):
             status=200)
     responses.add(responses.DELETE, "http://modelservice/api/detectorMappings?id=6XeANXABlK1-eG-Fo78V",
             status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.DELETE, "http://modelservice/api/v3/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             status=200)
-    responses.add(responses.DELETE, "http://modelservice/api/v2/detectors?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.DELETE, "http://modelservice/api/v3/detectors?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             status=200)
     test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
     assert len(test_metric.detectors) == 2
@@ -102,10 +102,10 @@ def test_train_metric_detectors(mock_metric):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     def validate_update_request(request):
@@ -116,7 +116,7 @@ def test_train_metric_detectors(mock_metric):
         assert isclose(thresholds["lowerWeak"], -9.48, rel_tol=0.01)
         assert isclose(thresholds["lowerStrong"], -14.59, rel_tol=0.01)
         return (200, {}, None)
-    responses.add_callback(responses.PUT, "http://modelservice/api/v2/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add_callback(responses.PUT, "http://modelservice/api/v3/detectors?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             callback=validate_update_request)
     test_metric = mock_metric(data=[5, 4, 7, 9, 15, 1, 0])
     assert len(test_metric.detectors) == 2

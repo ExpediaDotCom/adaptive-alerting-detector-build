@@ -21,7 +21,7 @@ from tests.conftest import DETECTOR_MAPPINGS_SEARCH_MOCK_RESPONSE, MOCK_DETECTOR
 
 @responses.activate
 def test_detector_client_get_detector(mock_metric):
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
     detector_client = DetectorClient()

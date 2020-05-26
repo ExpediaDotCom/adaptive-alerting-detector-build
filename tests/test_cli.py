@@ -21,10 +21,10 @@ def test_cli_build_detectors_already_exists(caplog):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     metric_configs, exit_code = read_config_file("./tests/data/metric-config.json")
@@ -50,10 +50,10 @@ def test_cli_build_new_detectors(caplog):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings",
             json=[],
             status=200)
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors",
             body="4fdc3395-e969-449a-a306-201db183c6d7",
             status=201)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
     responses.add(
@@ -63,10 +63,10 @@ def test_cli_build_new_detectors(caplog):
         status=200,
     )
     # error_count
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors",
             body="47a0661d-aceb-4ef2-bf06-0828f28631b4",
             status=201)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     responses.add(
@@ -76,10 +76,10 @@ def test_cli_build_new_detectors(caplog):
         status=200,
     )
     # success_rate
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors",
             body="16769303-a950-4d0f-a5a6-8d00eef886ec",
             status=201)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=16769303-a950-4d0f-a5a6-8d00eef886ec",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=16769303-a950-4d0f-a5a6-8d00eef886ec",
             json=MOCK_DETECTORS[2],
             status=200)
     responses.add(
@@ -89,10 +89,10 @@ def test_cli_build_new_detectors(caplog):
         status=200,
     )
     # latency
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors",
             body="5afc2bb3-4a5b-4a4b-8e30-890d67904588",
             status=201)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=5afc2bb3-4a5b-4a4b-8e30-890d67904588",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=5afc2bb3-4a5b-4a4b-8e30-890d67904588",
             json=MOCK_DETECTORS[3],
             status=200)
     responses.add(
@@ -117,10 +117,10 @@ def test_cli_disable_metric_detectors(caplog):
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/findMatchingByTags",
             json=FIND_BY_MATCHING_TAGS_MOCK_RESPONSE,
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             json=MOCK_DETECTORS[1],
             status=200)
     responses.add(responses.POST, "http://modelservice/api/detectorMappings/search",
@@ -133,9 +133,9 @@ def test_cli_disable_metric_detectors(caplog):
             status=200)
     responses.add(responses.PUT, "http://modelservice/api/detectorMappings/disable?id=6XeANXABlK1-eG-Fo78V",
             status=200)
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors/toggleDetector?enabled=false&uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors/toggleDetector?enabled=false&uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             status=200)
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors/toggleDetector?enabled=false&uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors/toggleDetector?enabled=false&uuid=47a0661d-aceb-4ef2-bf06-0828f28631b4",
             status=200)
     metric_configs, exit_code = read_config_file("./tests/data/metric-config-request-count.json")
     disable_exit_code = disable_detectors_for_metric_configs(metric_configs)
@@ -155,7 +155,7 @@ def test_cli_train_metric_detectors_sparse_data(caplog):
                 "lookupTimeInMillis": 2
                 },
         status=200)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=5afc2bb3-4a5b-4a4b-8e30-890d67904588",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=5afc2bb3-4a5b-4a4b-8e30-890d67904588",
             json=MOCK_DETECTORS[3],
             status=200)
     responses.add(

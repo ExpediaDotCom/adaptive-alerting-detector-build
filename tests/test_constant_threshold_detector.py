@@ -175,10 +175,10 @@ def test_train_detector_with_invalid_sample_size_raises_build_error(mock_metric)
     responses.add(responses.POST, "http://modelservice/api/detectorMappings",
             json=[],
             status=200)
-    responses.add(responses.POST, "http://modelservice/api/v2/detectors",
+    responses.add(responses.POST, "http://modelservice/api/v3/detectors",
             body="4fdc3395-e969-449a-a306-201db183c6d7",
             status=201)
-    responses.add(responses.GET, "http://modelservice/api/v2/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
+    responses.add(responses.GET, "http://modelservice/api/v3/detectors/findByUuid?uuid=4fdc3395-e969-449a-a306-201db183c6d7",
             json=MOCK_DETECTORS[0],
             status=200)
 
