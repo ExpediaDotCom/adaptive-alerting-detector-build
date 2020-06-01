@@ -14,7 +14,7 @@ class graphite(base_datasource):
         super(graphite, self).__init__(**kwargs)
 
     # how should nulls be treated?
-    def query(self, tags, start="-168hours", end="now", interval=None, fn="sum"):
+    def query(self, tags, start="-168hours", end="now", interval=None, fn="sum", maxDataPoints=None):
         try:
             tag_query = ",".join([f"'{k}={v}'" for k, v in sorted(tags.items())])
             query = f"seriesByTag({tag_query})"
@@ -25,6 +25,8 @@ class graphite(base_datasource):
             elif fn == "sum":
                 query = f"sumSeries({query})"
             params = {"target": query, "from": start, "until": end, "format": "json"}
+            if maxDataPoints:
+                params["maxDataPoints"] = maxDataPoints
             response = requests.get(self._render_url, params=params, headers=self._headers, timeout=60)
             response.raise_for_status()
             response_list = response.json()
