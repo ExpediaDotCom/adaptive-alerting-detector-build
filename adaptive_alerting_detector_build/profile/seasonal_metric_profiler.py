@@ -42,7 +42,7 @@ def _is_seasonal(
     :param df: Pandas DataFrame with DateTimeIndex
     :param period: Optional period to provide to seasonal test. It is advised to provide a period with the timeseries if
                    it is known, to reduce algorithm complexity and increase accuracy.
-    :return: boolean indicating whether the time series is seasonal, assuming the given significance level
+    :return: boolean indicating whether the time series is seasonal
     """
     seasonality_result: SeasonalityResult = _try_seasonality_check(
         df=df,

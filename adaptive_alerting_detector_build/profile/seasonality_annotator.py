@@ -8,9 +8,9 @@ def annotate_seasonality(
     """
     Takes the given SeasonalityResult, generates some descriptive text fields and returns it as an
     SeasonalityReport.
-    :param seasonality_result: StationarityResult
+    :param seasonality_result: SeasonalityResult
     :param timeseries_name: Text to show when generating description
-    :return: StationarityReport
+    :return: SeasonalityReport
     """
     is_seasonal: bool = seasonality_result.is_seasonal
     period: int = seasonality_result.period
