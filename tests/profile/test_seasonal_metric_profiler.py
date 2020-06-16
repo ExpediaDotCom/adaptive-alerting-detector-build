@@ -33,7 +33,7 @@ def test_build_profile_nonseasonal():
 
 def test_build_profile_nonseasonal_noisy():
     # a simple linear function with noise
-    series = [i / 5.0 for i in range(100)]
+    series = [i / 2.0 for i in range(100)]
     noisy = series + np.random.normal(0, 5, len(series))
     noisy_df = pd.DataFrame(noisy, columns=["value"])
     profile = build_seasonal_profile(noisy_df)
