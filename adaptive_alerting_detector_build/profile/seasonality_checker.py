@@ -9,6 +9,9 @@ from .seasonality_types import SeasonalityResult
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
+# minimum of two seasons is recommended, ideally 3
+MINIMUM_NUMBER_OF_SEASONS = 3
+
 
 def _preprocess_data(df: DataFrame):
     """
@@ -24,6 +27,7 @@ def _preprocess_data(df: DataFrame):
     series = df_nonan.to_numpy()
     return series
 
+
 def seasonality_check(
     df: DataFrame,
     period = None
@@ -37,7 +41,15 @@ def seasonality_check(
 
     data = _preprocess_data(df)
 
-    print('Running seasionality test...')
+    if data.size == 0:
+        raise ValueError("Data for seasonality test is not valid. Check if length of your dataset is 0.")
+
+    number_of_datapoints = data.size
+    if period and number_of_datapoints < period * MINIMUM_NUMBER_OF_SEASONS:
+        raise ValueError(f"Number of datapoints is less than minimum recommended number of datapoints. Make sure that the number of"
+                         f"datapoints is at least {period} * {MINIMUM_NUMBER_OF_SEASONS} (period * MINIMUM_NUMBER_OF_SEASONS)")
+
+    print('Running seasonality test...')
     seasons, trend = fit_seasons(data, period=period)
 
     if seasons is not None:

@@ -57,10 +57,7 @@ def _try_seasonality_check(
     df: DataFrame,
     period: int = None
 ) -> SeasonalityResult:
-    try:
-        return seasonality_check(
-            df=df,
-            period=period
-        )
-    except Exception as e:
-        raise ValueError("Encountered error during seasonal test") from e
+    return seasonality_check(
+        df=df,
+        period=period
+    )

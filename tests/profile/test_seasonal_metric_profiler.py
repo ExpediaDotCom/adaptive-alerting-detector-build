@@ -63,13 +63,12 @@ def test_build_profile_seasonal_with_wrong_period_argument_lower_than_length_of_
     assert not profile["seasonal"]
 
 
-def test_build_profile_seasonal_with_wrong_period_argument_larger_than__length_of_season():
-    # a simple multiplicative sine function
+def test_build_profile_seasonal_with_data_not_minimum_number_of_periods_long():
     with pytest.raises(ValueError) as exception:
-        series = _get_generated_sine_dataset()
+        series = _get_small_dataset()
         series_df = pd.DataFrame(series, columns=["value"])
-        build_seasonal_profile(series_df, period=2727)
-    assert str(exception.value) == "Encountered error during seasonal test"
+        build_seasonal_profile(series_df, period=4)
+    assert str(exception.value).startswith("Number of datapoints is less than minimum recommended number of datapoints.")
 
 
 def test_build_profile_seasonal_empty_dataset():
@@ -78,12 +77,14 @@ def test_build_profile_seasonal_empty_dataset():
         series_df = pd.DataFrame(series, columns=["value"])
         profile = build_seasonal_profile(series_df)
         assert profile["seasonal"]
-    assert str(exception.value) == "Encountered error during seasonal test"
+    assert str(exception.value) == "Data for seasonality test is not valid. Check if length of your dataset is 0."
 
 
 def _get_generated_sine_dataset():
     return [10 * math.sin(i * 2 * math.pi / 25) + i * i / 100.0 for i in range(100)]
 
+def _get_small_dataset():
+    return [1, 2, 3, 4, 5]
 
 def _get_generated_noisy_sine_dataset():
     series = _get_generated_sine_dataset()
