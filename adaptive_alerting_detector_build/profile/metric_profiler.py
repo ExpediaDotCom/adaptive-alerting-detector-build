@@ -14,8 +14,8 @@ from .stationarity_types import StationarityResult, StationarityReport
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
-# TODO this method and file is specialised for stationarity test, consider renaming to
-# build_stationarity_profile() and stationary_metric_profiler.py respectively
+# TODO this method and file is specialised for stationarity test, consider refactoring based on
+# https://jira.expedia.biz/browse/AUT-3696
 
 def build_profile(
     df: DataFrame,
