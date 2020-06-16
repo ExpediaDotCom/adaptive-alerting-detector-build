@@ -14,6 +14,12 @@ from .stationarity_types import StationarityResult, StationarityReport
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
+# TODO this method and file is specialised for stationarity test, consider preferred using a single point of call
+#  and useing build_profile as an entry point for the profiler. We can pass the parameter to select the type of profiler
+#  we want to run, like create a stationarity profiler object handler and call the function, something like creating
+#  factory methods for object type based on _is_stationary or _is_seasonal. From there handler can call appropriate
+#  profiler test function. For stationarity profiler object, it will call _is_stationary and for seasonal profiler
+#  object, it can call _is_seasonal.
 
 def build_profile(
     df: DataFrame,

@@ -62,6 +62,13 @@ def test_cli_build_new_detectors(caplog):
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json&maxDataPoints=10080",
+        json=GRAPHITE_MOCK_RESPONSE,
+        status=200,
+    )
+
     # error_count
     responses.add(responses.POST, "http://modelservice/api/v2/detectors",
             body="47a0661d-aceb-4ef2-bf06-0828f28631b4",
@@ -72,6 +79,12 @@ def test_cli_build_new_detectors(caplog):
     responses.add(
         responses.GET,
         "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_5xx'))&from=-168hours&until=now&format=json",
+        json=GRAPHITE_MOCK_RESPONSE,
+        status=200,
+    )
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_5xx'))&from=-168hours&until=now&format=json&maxDataPoints=10080",
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
@@ -88,6 +101,12 @@ def test_cli_build_new_detectors(caplog):
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=elb_success_rate'))&from=-168hours&until=now&format=json&maxDataPoints=10080",
+        json=GRAPHITE_MOCK_RESPONSE,
+        status=200,
+    )
     # latency
     responses.add(responses.POST, "http://modelservice/api/v2/detectors",
             body="5afc2bb3-4a5b-4a4b-8e30-890d67904588",
@@ -101,6 +120,13 @@ def test_cli_build_new_detectors(caplog):
         json=GRAPHITE_MOCK_RESPONSE,
         status=200,
     )
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json&maxDataPoints=10080",
+        json=GRAPHITE_MOCK_RESPONSE,
+        status=200,
+    )
+
     metric_configs, exit_code = read_config_file("./tests/data/metric-config.json")
     build_exit_code = build_detectors_for_metric_configs(metric_configs)
     assert build_exit_code == 0
@@ -161,6 +187,12 @@ def test_cli_train_metric_detectors_sparse_data(caplog):
     responses.add(
         responses.GET,
         "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json",
+        json=GRAPHITE_SPARSE_DATA_MOCK_RESPONSE,
+        status=200,
+    )
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=sumSeries(seriesByTag('app=my-web-app','what=tp90'))&from=-168hours&until=now&format=json&maxDataPoints=10080",
         json=GRAPHITE_SPARSE_DATA_MOCK_RESPONSE,
         status=200,
     )

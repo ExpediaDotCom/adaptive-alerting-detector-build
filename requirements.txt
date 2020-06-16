@@ -22,6 +22,7 @@ related==0.7.2
 requests==2.23.0
 scipy==1.4.1
 seaborn==0.10.0
+seasonal==0.3.1
 six==1.14.0
 statsmodels==0.11.1
 urllib3==1.25.8

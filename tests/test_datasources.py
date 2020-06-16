@@ -62,6 +62,21 @@ def test_graphite_query_with_interval():
     assert isinstance(df, pd.DataFrame)
     assert isinstance(df.index, pd.DatetimeIndex)
 
+@responses.activate
+def test_graphite_query_with_maxdatapoints():
+    responses.add(
+        responses.GET,
+        "http://graphite/render?target=sumSeries(seriesByTag('role=my-web-app','what=elb_2xx'))&from=-168hours&until=now&format=json&maxDataPoints=10080",
+        json=GRAPHITE_MOCK_RESPONSE,
+        status=200,
+    )
+    graphite_datasource = graphite(url="http://graphite")
+    df = graphite_datasource.query(
+        tags={"role": "my-web-app", "what": "elb_2xx"}, start="-168hours", end="now", maxDataPoints=10080
+    )
+    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df.index, pd.DatetimeIndex)
+
 
 @responses.activate
 def test_graphite_query_with_empty_response():
