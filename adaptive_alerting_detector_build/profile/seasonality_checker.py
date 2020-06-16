@@ -49,7 +49,7 @@ def seasonality_check(
         raise ValueError(f"Number of datapoints is less than minimum recommended number of datapoints. Make sure that the number of"
                          f"datapoints is at least {period} * {MINIMUM_NUMBER_OF_SEASONS} (period * MINIMUM_NUMBER_OF_SEASONS)")
 
-    print('Running seasonality test...')
+    LOGGER.info('Running seasonality test...')
     seasons, trend = fit_seasons(data, period=period)
 
     if seasons is not None:
