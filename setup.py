@@ -31,7 +31,7 @@ setup(
         "pyparsing==2.4.6",
         "python-dateutil==2.8.1",
         "pytz==2019.3",
-        "pyyaml==5.3.1",
+        "pyyaml==5.4",
         "related==0.7.2",
         "requests==2.23.0",
         "scipy==1.4.1",
