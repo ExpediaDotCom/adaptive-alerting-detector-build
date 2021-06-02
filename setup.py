@@ -38,7 +38,7 @@ setup(
         "seaborn==0.10.0",
         "six==1.14.0",
         "statsmodels==0.11.1",
-        "urllib3==1.25.8",
+        "urllib3==1.26.5",
     ],
     classifiers=["Programming Language :: Python :: 3",],
     entry_points={
