@@ -14,7 +14,7 @@ setup(
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         "attrs==19.3.0",
-        "certifi==2019.11.28",
+        "certifi==2022.12.7",
         "chardet==3.0.4",
         "cycler==0.10.0",
         "dataclasses==0.6; python_version < '3.7'",
